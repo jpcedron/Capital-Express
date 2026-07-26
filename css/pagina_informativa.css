@@ -1,0 +1,101 @@
+/* ── Variables de color de Capital Express ── */
+:root {
+    --ce-navy:      #0d1f3c;/* #0d6efd */
+    --ce-navy-mid:  #1a3560;/* #6610f2*/
+    --ce-gold:      #c9a84c;
+    --ce-gold-light:#e8c876;
+    --ce-light:     #f4f6fb;
+    --ce-text:      #1e2a3a;
+}
+
+/* ── Tipografía base ── */
+body { font-family: 'Segoe UI', system-ui, 'Inter', sans-serif; color: var(--ce-text); background: var(--ce-light); }
+.brand-heading { font-family: 'Playfair Display', serif; }
+
+/* ── Navbar ── */
+.navbar-ce { background-color: var(--ce-navy); }
+.navbar-ce .navbar-brand { font-weight: 700; color: var(--ce-gold) !important; font-size: 1.3rem; letter-spacing: .5px; }
+.navbar-ce .nav-link { color: rgba(255,255,255,.85) !important; font-size: .9rem; transition: color .2s; }
+.navbar-ce .nav-link:hover { color: var(--ce-gold) !important; }
+.navbar-ce .btn-gold { background-color: var(--ce-gold); color: var(--ce-navy); font-weight: 700; border: none; }
+.navbar-ce .btn-gold:hover { background-color: var(--ce-gold-light); color: var(--ce-navy); }
+.navbar-toggler { border-color: rgba(201,168,76,.5) !important; }
+.navbar-toggler-icon { filter: invert(1); }
+
+/* ── Hero ── */
+.hero-section {
+    background: linear-gradient(135deg, var(--ce-navy) 0%, var(--ce-navy-mid) 100%);
+    padding: 7rem 0 5rem;
+    color: #fff;
+}
+.hero-section .display-4 { font-weight: 800; line-height: 1.2; }
+.hero-section .lead { color: rgba(255,255,255,.8); font-size: 1.15rem; }
+.badge-gold { background-color: var(--ce-gold); color: var(--ce-navy); font-weight: 700; }
+.stat-card {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    backdrop-filter: blur(4px);
+}
+.stat-card .stat-num { font-size: 2rem; font-weight: 800; color: var(--ce-gold); line-height: 1; }
+.stat-card .stat-lbl { font-size: .8rem; color: rgba(255,255,255,.75); margin-top: .25rem; }
+
+/* ── Section headers ── */
+.section-title { font-weight: 800; color: var(--ce-navy); }
+.section-divider { width: 56px; height: 4px; background: var(--ce-gold); border-radius: 2px; margin-bottom: 1rem; }
+
+/* ── Quiénes somos ── */
+#quienes { background-color: #fff; }
+.valor-card { border: none; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,.07); transition: transform .25s, box-shadow .25s; }
+.valor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 28px rgba(0,0,0,.12); }
+.valor-icon { width: 56px; height: 56px; border-radius: 12px; background-color: var(--ce-navy); color: var(--ce-gold); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
+
+/* ── Cómo prestamos ── */
+#prestamos { background-color: var(--ce-light); }
+.ejemplo-card { background: var(--ce-navy); color: #fff; border-radius: 14px; padding: 2rem; }
+.ejemplo-card .monto { font-size: 2.2rem; font-weight: 800; color: var(--ce-gold); }
+.modalidad-badge { background-color: var(--ce-navy); color: var(--ce-gold); font-weight: 700; border-radius: 50px; padding: .5rem 1.5rem; font-size: .95rem; display: inline-flex; align-items: center; gap: .5rem; }
+
+/* ── Mora ── */
+#mora { background-color: #fff; }
+.mora-row-success { --bs-table-accent-bg: #d1e7dd; }
+.bg-orange { background-color: #fd7e14 !important; }
+.badge-orange { background-color: #fd7e14; }
+.formula-box { background: var(--ce-navy); color: #fff; border-radius: 12px; padding: 1.5rem 2rem; font-family: 'Courier New', monospace; font-size: 1.05rem; }
+.formula-box span { color: var(--ce-gold); font-weight: 700; }
+
+/* ── Compromiso ── */
+#compromiso { background: linear-gradient(135deg, var(--ce-navy) 0%, var(--ce-navy-mid) 100%); color: #fff; }
+#compromiso .section-title { color: #fff; }
+.compromiso-item { display: flex; align-items: flex-start; gap: 1rem; padding: .75rem 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+.compromiso-item:last-child { border-bottom: none; }
+.compromiso-item .bi { color: var(--ce-gold); font-size: 1.3rem; flex-shrink: 0; margin-top: .1rem; }
+
+/* ── Contacto ── */
+#contacto { background-color: var(--ce-light); }
+.contact-info-card { background: var(--ce-navy); color: #fff; border-radius: 14px; padding: 2rem; height: 100%; }
+.contact-info-card .ci-item { display: flex; align-items: flex-start; gap: 1rem; padding: .85rem 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+.contact-info-card .ci-item:last-child { border-bottom: none; }
+.contact-info-card .ci-icon { width: 44px; height: 44px; border-radius: 10px; background: rgba(201,168,76,.2); color: var(--ce-gold); font-size: 1.2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contact-info-card .ci-label { font-size: .75rem; color: rgba(255,255,255,.6); margin-bottom: .2rem; }
+.contact-info-card .ci-value { font-weight: 600; font-size: .95rem; }
+.contact-form-card { background: #fff; border-radius: 14px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+.form-control:focus, .form-select:focus { border-color: var(--ce-gold); box-shadow: 0 0 0 .2rem rgba(201,168,76,.25); }
+.btn-ce-primary { background-color: var(--ce-navy); color: #fff; font-weight: 700; border: none; padding: .75rem 2rem; }
+.btn-ce-primary:hover { background-color: var(--ce-navy-mid); color: #fff; }
+
+/* ── Footer ── */
+footer { background-color: var(--ce-navy); color: rgba(255,255,255,.65); }
+footer .footer-brand { color: var(--ce-gold); font-weight: 800; font-size: 1.25rem; }
+footer a { color: rgba(255,255,255,.65); text-decoration: none; transition: color .2s; }
+footer a:hover { color: var(--ce-gold); }
+footer .divider { border-color: rgba(255,255,255,.1); }
+
+/* ── Smooth scroll ── */
+html { scroll-behavior: smooth; }
+
+/* ── Back to top ── */
+#backToTop { display: none; position: fixed; bottom: 2rem; right: 2rem; z-index: 999; background: var(--ce-gold); color: var(--ce-navy); border: none; border-radius: 50%; width: 46px; height: 46px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+#backToTop:hover { background: var(--ce-gold-light); }

@@ -1,0 +1,76 @@
+body { font-family: 'Inter', sans-serif; }
+.brand-heading { font-family: 'Playfair Display', serif; }
+/* Solo las variables de color que Bootstrap no cubre */
+:root {
+    --navy:      #0d1f3c;
+    --navy-mid:  #162451;
+    --navy-light:#1e3066;
+    --gold:      #c9a84c;
+    --gold-light:#e8c876;
+}
+/* Fondo del panel derecho */
+.bg-navy       { background-color: var(--navy) !important; }
+.bg-navy-mid   { background-color: var(--navy-mid) !important; }
+.text-gold     { color: var(--gold) !important; }
+.btn-gold {
+    background-color: var(--gold);
+    color: var(--navy);
+    font-weight: 600;
+    border: none;
+    letter-spacing: .04em;
+}
+.btn-gold:hover {
+    background-color: var(--gold-light);
+    color: var(--navy);
+}
+.input-navy {
+    background-color: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.15);
+    color: #fff;
+}
+.input-navy::placeholder { color: rgba(255,255,255,.4); }
+.input-navy:focus {
+    background-color: rgba(255,255,255,.1);
+    border-color: var(--gold);
+    color: #fff;
+    box-shadow: 0 0 0 .2rem rgba(201,168,76,.2);
+}
+.divider-gold {
+    border-color: var(--gold);
+    opacity: .5;
+}
+.icon-box {
+    width: 52px; height: 52px;
+    background-color: rgba(201,168,76,.15);
+    border: 1px solid rgba(201,168,76,.35);
+}
+.stat-card {
+    background-color: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+}
+.toggle-pass {
+    background-color: transparent;
+    border: 1px solid rgba(255,255,255,.15);
+    border-left: none;
+    color: rgba(255,255,255,.5);
+    cursor: pointer;
+}
+.toggle-pass:hover { color: var(--gold); }
+/* Marca de agua decorativa */
+.watermark {
+    position: absolute;
+    bottom: -30px; right: -30px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 40px solid rgba(201,168,76,.06);
+    pointer-events: none;
+}
+.watermark-2 {
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    border: 30px solid rgba(201,168,76,.05);
+    pointer-events: none;
+}
+.vh-100-min { min-height: 100vh; }
