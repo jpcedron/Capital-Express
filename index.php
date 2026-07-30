@@ -14,7 +14,7 @@
         <div class="card-header text-white" style="background: linear-gradient(135deg, #1a3560, #0d1b3a);">
 
             <h3>Capital Express</h3>
-            <small>Préstamos Financieros</small>
+            <small>Finanzas con Confianza</small>
 
         </div>
 

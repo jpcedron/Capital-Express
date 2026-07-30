@@ -188,7 +188,7 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
 <h2 >CAPITAL EXPRESS</h2>
 
 <p class="mb-0">
-Préstamos Financieros
+Finanzas con Confianza
 </p>
 
 </div>
