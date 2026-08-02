@@ -55,12 +55,13 @@ $prestamosPagados = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
 
 /* CLIENTES EN MORA */
+$clientesMora = $conexion->query("
+    SELECT nombre, pendiente, mora
+    FROM prestamos
+    WHERE estado = 'Mora'
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC); 
 
-$sql = "SELECT COUNT(*) AS total
-        FROM prestamos
-        WHERE estado = 'Mora'";
-
-$clientesMora = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
 
 /*  CUOTAS VENCIDAS */
@@ -71,6 +72,71 @@ $sql = "SELECT COUNT(*) AS total
         AND fecha_vencimiento < CURDATE()";
 
 $cuotasVencidas = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
+
+// Préstamos por estado
+$activos = $conexion->query("
+SELECT COUNT(*) AS total
+FROM prestamos
+WHERE estado='Activo'
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+$mora = $conexion->query(" 
+SELECT COUNT(*) AS total
+FROM prestamos
+WHERE estado='Mora'
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+$pagados = $conexion->query(" SELECT COUNT(*) AS total
+FROM prestamos
+WHERE estado='Pagado'
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+// Totales económicos
+$totalPrestado = $conexion->query(" SELECT COALESCE(SUM(monto),0) AS total
+FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+$totalRecuperado = $conexion->query(" SELECT COALESCE(SUM(abonado),0) AS total
+FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+$totalPendiente = $conexion->query(" SELECT COALESCE(SUM(pendiente),0) AS total
+FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+$cuotasVencidas = $conexion->query(" SELECT
+    c.numero_cuota,
+    c.fecha_vencimiento,
+    p.nombre
+FROM cuotas c
+INNER JOIN prestamos p ON p.id = c.prestamo_id
+WHERE c.estado='Pendiente'
+AND c.fecha_vencimiento < CURDATE()
+LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC); 
+
+
+$sqlUltimosPagos = " SELECT
+    pa.fecha_pago,
+    pa.valor_pago,
+    pa.pago_capital,
+    pa.pago_mora,
+    pa.saldo_restante,
+    c.nombre,
+    p.cedula
+FROM pagos pa
+INNER JOIN prestamos p
+    ON pa.prestamo_id = p.id
+INNER JOIN clientes c
+    ON p.cedula = c.cedula
+ORDER BY pa.fecha_pago DESC
+LIMIT 10
+";
+
+$stmt = $conexion->query($sqlUltimosPagos);
+$ultimosPagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 
@@ -96,8 +162,6 @@ if($hora < 12){
 
 ?>
 
-
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -108,129 +172,127 @@ if($hora < 12){
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <link rel="stylesheet" href="../css/dashboard.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <!-- Sidebar -->
+    <div class="sidebar">
 
-<div class="sidebar">
+        <h3 class="brand-heading">
 
-<h3 class="brand-heading"> 
+            <i class="fa-solid fa-building-columns"></i>
 
-<i class="fa-solid fa-building-columns"></i>
+            Capital Express
 
-Capital Express
+        </h3>
 
-</h3>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-chart-line"></i>
 
-<i class="fa-solid fa-chart-line"></i>
+                Dashboard
 
-Dashboard
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-users"></i>
 
-<i class="fa-solid fa-users"></i>
+                Clientes
 
-Clientes
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-money-bill-wave"></i>
 
-<i class="fa-solid fa-money-bill-wave"></i>
+                Préstamos
 
-Préstamos
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-wallet"></i>
 
-<i class="fa-solid fa-wallet"></i>
+                Pagos
 
-Pagos
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-calendar-days"></i>
 
-<i class="fa-solid fa-calendar-days"></i>
+                Cuotas
 
-Cuotas
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-file-lines"></i>
 
-<i class="fa-solid fa-file-lines"></i>
+                Reportes
 
-Reportes
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-gear"></i>
 
-<i class="fa-solid fa-gear"></i>
+                Configuración
 
-Configuración
+            </a>
 
-</a>
+            <a href="#">
 
-<a href="#">
+                <i class="fa-solid fa-right-from-bracket"></i>
 
-<i class="fa-solid fa-right-from-bracket"></i>
+                Cerrar sesión
 
-Cerrar sesión
+            </a>
 
-</a>
+    </div>
 
-</div>
+    <!-- Topbar -->
+    <div class="topbar">
 
-<!-- Topbar -->
+        <h4>
 
-<div class="topbar">
+        Panel Administrativo
 
-<h4>
-
-Panel Administrativo
-
-</h4>
+        </h4>
 
 
-<div class="usuario">
+        <div class="usuario">
 
-<i class="fa-solid fa-circle-user"></i>
+            <i class="fa-solid fa-circle-user"></i>
 
-Administrador
-
-
-</div>
+            Administrador
 
 
-</div>
+        </div>
 
-<!-- Contenido -->
 
-<div class="contenido">
+        </div>
 
-<div class="bienvenida">
+        <!-- Contenido -->
+        <div class="contenido">
 
-<h2>
+            <div class="bienvenida">
 
-Bienvenido a Capital Express
+                <h2>
 
-</h2>
+                Bienvenido a Capital Express
 
-<p>
+                </h2>
 
-Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consultar toda la información del sistema.
+                <p>
 
-</p>
+                Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consultar toda la información del sistema.
 
-<div class="row mt-2">
+                </p>
+
+        <div class="row mt-2">
 
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card-mini">
@@ -251,7 +313,7 @@ Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consu
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card-mini">
                     <i class="fa-solid fa-triangle-exclamation"></i>
-                    <h3><?= $clientesMora ?></h3>
+                    <h3><?= count($clientesMora) ?></h3>
                     <span>Clientes en Mora</span>
                 </div>
             </div>
@@ -259,84 +321,193 @@ Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consu
             <div class="col-xl-3 col-md-6 mb-4">
                 <div class="card-mini">
                     <i class="fa-solid fa-calendar-days"></i>
-                    <h3><?= $cuotasVencidas ?></h3>
+                    <h3><?= count($cuotasVencidas) ?></h3>
                     <span>Cuotas Vencidas</span>
                 </div>
             </div>
 
         </div>
 
+    </div>
+
+    <div class="row mt-4">
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card-dashboard">
+
+                <div>
+
+                    <h6>Clientes</h6>
+
+                    <h3><?php echo number_format($totalClientes); ?></h3>
+
+                </div>
+
+                <i class="fa-solid fa-users"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card-dashboard">
+
+                <div>
+
+                    <h6>Capital Prestado</h6>
+
+                    <h3>$<?php echo number_format($capitalPrestado, 0, ',', '.'); ?></h3>
+
+                </div>
+
+                <i class="fa-solid fa-money-bill-wave"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card-dashboard">
+
+                <div>
+
+                    <h6>Total Recaudado</h6>
+
+                    <h3>$<?php echo number_format($totalPagado, 0, ',', '.'); ?></h3>
+
+                </div>
+
+                <i class="fa-solid fa-wallet"></i>
+
+            </div>
+
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card-dashboard">
+
+                <div>
+
+                    <h6>Mora</h6>
+
+                    <h3>$<?php echo number_format($totalMora, 0, ',', '.'); ?></h3>
+
+                </div>
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+   <div class="row mt-4">
+
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm p-3">
+
+            <h5 class="mb-3">
+                <i class="fa-solid fa-chart-column text-primary"></i>
+                Préstamos por Estado
+            </h5>
+
+            <canvas id="graficaPrestamos"></canvas>
+
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm p-3">
+
+            <h5 class="mb-3">
+                <i class="fa-solid fa-chart-pie text-warning"></i>
+                Distribución
+            </h5>
+
+            <canvas id="graficaCircular"></canvas>
+
+        </div>
+    </div>
+
 </div>
 
-<div class="row mt-4">
 
-    <div class="col-xl-3 col-md-6 mb-4">
+<div class="row">
 
-        <div class="card-dashboard">
+    <div class="col-12">
 
-            <div>
+        <div class="card shadow-sm">
 
-                <h6>Clientes</h6>
+            <div class="card-header bg-white">
 
-                <h3><?php echo number_format($totalClientes); ?></h3>
-
-            </div>
-
-            <i class="fa-solid fa-users"></i>
-
-        </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-
-        <div class="card-dashboard">
-
-            <div>
-
-                <h6>Capital Prestado</h6>
-
-                <h3>$<?php echo number_format($capitalPrestado, 0, ',', '.'); ?></h3>
+                <h5 class="mb-0">
+                    <i class="fa-solid fa-money-bill-wave text-success"></i>
+                    Últimos pagos registrados
+                </h5>
 
             </div>
 
-            <i class="fa-solid fa-money-bill-wave"></i>
+            <div class="card-body table-responsive">
 
-        </div>
+                <table class="table table-hover align-middle">
 
-    </div>
+                    <thead>
 
-    <div class="col-xl-3 col-md-6 mb-4">
+                        <tr>
 
-        <div class="card-dashboard">
+                            <th>Cliente</th>
+                            <th>Cédula</th>
+                            <th>Fecha</th>
+                            <th>Valor</th>
 
-            <div>
+                        </tr>
 
-                <h6>Total Recaudado</h6>
+                    </thead>
 
-                <h3>$<?php echo number_format($totalPagado, 0, ',', '.'); ?></h3>
+                    <tbody>
+
+<?php foreach ($ultimosPagos as $pago): ?>
+
+<tr>
+
+    <td><?= htmlspecialchars($pago['nombre']) ?></td>
+
+    <td><?= htmlspecialchars($pago['cedula']) ?></td>
+
+    <td><?= date('d/m/Y H:i', strtotime($pago['fecha_pago'])) ?></td>
+
+    <td class="text-end">
+        $<?= number_format($pago['pago_capital'], 0, ',', '.') ?>
+    </td>
+
+    <td class="text-end text-danger">
+        $<?= number_format($pago['pago_mora'], 0, ',', '.') ?>
+    </td>
+
+    <td class="text-end text-success fw-bold">
+        $<?= number_format($pago['valor_pago'], 0, ',', '.') ?>
+    </td>
+
+    <td class="text-end">
+        $<?= number_format($pago['saldo_restante'], 0, ',', '.') ?>
+    </td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</tbody>
+
+                </table>
 
             </div>
-
-            <i class="fa-solid fa-wallet"></i>
-
-        </div>
-
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-
-        <div class="card-dashboard">
-
-            <div>
-
-                <h6>Mora</h6>
-
-                <h3>$<?php echo number_format($totalMora, 0, ',', '.'); ?></h3>
-
-            </div>
-
-            <i class="fa-solid fa-triangle-exclamation"></i>
 
         </div>
 
@@ -344,8 +515,143 @@ Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consu
 
 </div>
 
+
+    <div class="card shadow mt-4">
+
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">⚠️ Alertas del sistema</h5>
+    </div>
+
+    <div class="card-body">
+
+        <?php if(empty($clientesMora) && empty($cuotasVencidas)){ ?>
+
+            <div class="alert alert-success mb-0">
+                No hay alertas pendientes.
+            </div>
+
+        <?php } ?>
+
+        <?php foreach($clientesMora as $cliente){ ?>
+
+            <div class="alert alert-danger">
+
+                <strong><?= htmlspecialchars($cliente['nombre']) ?></strong>
+
+                tiene un préstamo en mora.
+
+                <br>
+
+                Pendiente:
+                <strong>$<?= number_format($cliente['pendiente'],0,',','.') ?></strong>
+
+            </div>
+
+        <?php } ?>
+
+        <?php foreach($cuotasVencidas as $cuota){ ?>
+
+            <div class="alert alert-warning">
+
+                <?= htmlspecialchars($cuota['nombre']) ?>
+
+                tiene vencida la cuota
+
+                <strong>#<?= $cuota['numero_cuota'] ?></strong>
+
+                desde
+
+                <strong><?= $cuota['fecha_vencimiento'] ?></strong>
+
+            </div>
+
+        <?php } ?>
+
+    </div>
+
 </div>
+
+</div>  
+
+</div>
+
+
+
+<script>
+
+
+const activos = <?= $activos ?>;
+const mora = <?= $mora ?>;
+const pagados = <?= $pagados ?>;
+
+new Chart(document.getElementById('graficaPrestamos'),{
+
+    type:'bar',
+
+    data:{
+
+        labels:[
+            'Activos',
+            'En Mora',
+            'Pagados'
+        ],
+
+        datasets:[{
+
+            label:'Préstamos',
+
+            data:[
+                activos,
+                mora,
+                pagados
+            ]
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+            legend:{
+                display:false
+            }
+        }
+
+    }
+
+});
+
+new Chart(document.getElementById('graficaCircular'),{
+
+    type:'doughnut',
+
+    data:{
+
+        labels:[
+            'Activos',
+            'Mora',
+            'Pagados'
+        ],
+
+        datasets:[{
+
+            data:[
+                activos,
+                mora,
+                pagados
+            ]
+
+        }]
+
+    }
+
+});
+
+</script>
+
 
 </body>
-
 </html>

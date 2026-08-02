@@ -223,21 +223,9 @@
   </div><!-- /.row -->
 </div><!-- /.container-fluid -->
 
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  // Toggle mostrar/ocultar contraseña
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput  = document.getElementById('password');
-  const eyeIcon        = document.getElementById('eyeIcon');
 
-  togglePassword.addEventListener('click', function () {
-    const isPassword = passwordInput.type === 'password';
-    passwordInput.type = isPassword ? 'text' : 'password';
-    eyeIcon.classList.toggle('bi-eye', !isPassword);
-    eyeIcon.classList.toggle('bi-eye-slash', isPassword);
-  });
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/login.js"></script>
 
 </body>
 </html>

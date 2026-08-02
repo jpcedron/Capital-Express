@@ -165,9 +165,7 @@ transition: color .2s;
 }
 .toggle-pass:hover { color: var(--gold); }
 
-/* ============================================
-Badge "ACCESO ADMINISTRADOR"
-============================================ */
+/* Badge "ACCESO ADMINISTRADOR" */
 .admin-badge {
 background-color: rgba(201,168,76,.12);
 border: 1px solid rgba(201,168,76,.3);
@@ -188,9 +186,7 @@ animation: pulse-dot 2s ease-in-out infinite;
 50%       { opacity: .5; transform: scale(.75);  }
 }
 
-/* ============================================
-Marcas de agua decorativas
-============================================ */
+/* Marcas de agua decorativas */
 .watermark {
 position: absolute;
 bottom: -30px; right: -30px;
