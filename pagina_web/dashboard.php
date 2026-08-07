@@ -6,142 +6,174 @@ require_once "../config/conexion.php";
 $conexion = (new Conexion())->conectar();
 
 
-/* TOTAL CLIENTES */
+/* INDICADORES GENERALES */
 
+/* TOTAL CLIENTES */
 $sql = "SELECT COUNT(*) AS total FROM clientes";
 $totalClientes = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
 
-/* PRESTAMOS ACTIVOS */
-
-$sql = "SELECT COALESCE(SUM(monto),0) AS total
+/* PRÉSTAMOS ACTIVOS */
+$sql = "SELECT COUNT(*) AS total
         FROM prestamos
-        WHERE estado='Activo'";
+        WHERE estado = 'Activo'";
+$prestamosActivos = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
+
+/* PRÉSTAMOS PAGADOS */
+$sql = "SELECT COUNT(*) AS total
+        FROM prestamos
+        WHERE estado = 'Pagado'";
+$prestamosPagados = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+/* CAPITAL PRESTADO EN PRÉSTAMOS ACTIVOS */
+$sql = "SELECT COALESCE(SUM(monto), 0) AS total
+        FROM prestamos
+        WHERE estado = 'Activo'";
 $capitalPrestado = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
 
 /* TOTAL RECAUDADO */
-
-$sql = "SELECT COALESCE(SUM(valor_pago),0) AS total
+$sql = "SELECT COALESCE(SUM(valor_pago), 0) AS total
         FROM pagos";
-
 $totalPagado = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
 
 /* TOTAL MORA */
-
-$sql = "SELECT COALESCE(SUM(mora),0) AS total
+$sql = "SELECT COALESCE(SUM(mora), 0) AS total
         FROM prestamos";
-
 $totalMora = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
 
-/* PRÉSTAMOS ACTIVOS */
 
-$sql = "SELECT COUNT(*) AS total
-        FROM prestamos
-        WHERE estado = 'Activo'";
+/* PRÉSTAMOS POR ESTADO - GRÁFICAS */
 
-$prestamosActivos = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
+$activos = $prestamosActivos;
 
-
-/*  PRÉSTAMOS PAGADOS */
-
-$sql = "SELECT COUNT(*) AS total
-        FROM prestamos
-        WHERE estado = 'Pagado'";
-
-$prestamosPagados = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
-
-
-/* CLIENTES EN MORA */
-$clientesMora = $conexion->query("
-    SELECT nombre, pendiente, mora
+$mora = $conexion->query("
+    SELECT COUNT(*) AS total
     FROM prestamos
     WHERE estado = 'Mora'
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+$pagados = $prestamosPagados;
+
+
+/* TOTALES ECONÓMICOS */
+
+$totalPrestado = $conexion->query("
+    SELECT COALESCE(SUM(monto), 0) AS total
+    FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+$totalRecuperado = $conexion->query("
+    SELECT COALESCE(SUM(abonado), 0) AS total
+    FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+$totalPendiente = $conexion->query("
+    SELECT COALESCE(SUM(pendiente), 0) AS total
+    FROM prestamos
+")->fetch(PDO::FETCH_ASSOC)['total'];
+
+
+/* ALERTAS INTELIGENTES */
+
+
+/* 🔴 CLIENTES EN MORA */
+
+$clientesMora = $conexion->query(" SELECT 
+        p.id AS prestamo_id,
+        c.id AS cliente_id,
+        c.nombre,
+        c.cedula,
+        p.pendiente,
+        p.mora
+    FROM prestamos p
+    INNER JOIN clientes c 
+        ON p.cedula = c.cedula
+    WHERE p.estado = 'Mora'
+    ORDER BY p.mora DESC
     LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC); 
+")->fetchAll(PDO::FETCH_ASSOC);
 
 
-
-/*  CUOTAS VENCIDAS */
-
-$sql = "SELECT COUNT(*) AS total
-        FROM cuotas
-        WHERE estado <> 'Pagada'
-        AND fecha_vencimiento < CURDATE()";
-
-$cuotasVencidas = $conexion->query($sql)->fetch(PDO::FETCH_ASSOC)['total'];
-
-// Préstamos por estado
-$activos = $conexion->query("
-SELECT COUNT(*) AS total
-FROM prestamos
-WHERE estado='Activo'
-")->fetch(PDO::FETCH_ASSOC)['total'];
-
-
-$mora = $conexion->query(" 
-SELECT COUNT(*) AS total
-FROM prestamos
-WHERE estado='Mora'
-")->fetch(PDO::FETCH_ASSOC)['total'];
-
-$pagados = $conexion->query(" SELECT COUNT(*) AS total
-FROM prestamos
-WHERE estado='Pagado'
-")->fetch(PDO::FETCH_ASSOC)['total'];
-
-
-// Totales económicos
-$totalPrestado = $conexion->query(" SELECT COALESCE(SUM(monto),0) AS total
-FROM prestamos
-")->fetch(PDO::FETCH_ASSOC)['total'];
-
-$totalRecuperado = $conexion->query(" SELECT COALESCE(SUM(abonado),0) AS total
-FROM prestamos
-")->fetch(PDO::FETCH_ASSOC)['total'];
-
-$totalPendiente = $conexion->query(" SELECT COALESCE(SUM(pendiente),0) AS total
-FROM prestamos
-")->fetch(PDO::FETCH_ASSOC)['total'];
+/* 🟠 CUOTAS VENCIDAS */
 
 $cuotasVencidas = $conexion->query(" SELECT
-    c.numero_cuota,
-    c.fecha_vencimiento,
-    p.nombre
-FROM cuotas c
-INNER JOIN prestamos p ON p.id = c.prestamo_id
-WHERE c.estado='Pendiente'
-AND c.fecha_vencimiento < CURDATE()
-LIMIT 5
-")->fetchAll(PDO::FETCH_ASSOC); 
+        c.id AS cuota_id,
+        c.prestamo_id,
+        c.numero_cuota,
+        c.fecha_vencimiento,
+        c.valor,
+        cl.id AS cliente_id,
+        cl.nombre,
+        cl.cedula
+    FROM cuotas c
+    INNER JOIN prestamos p
+        ON p.id = c.prestamo_id
+    INNER JOIN clientes cl
+        ON p.cedula = cl.cedula
+    WHERE c.estado = 'Pendiente'
+      AND c.fecha_vencimiento < CURDATE()
+    ORDER BY c.fecha_vencimiento ASC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
 
+
+/* 🟡 PRÓXIMOS VENCIMIENTOS
+   Próximos 3 días */
+
+$proximosVencimientos = $conexion->query(" SELECT
+        c.id AS cuota_id,
+        c.prestamo_id,
+        c.numero_cuota,
+        c.fecha_vencimiento,
+        c.valor,
+        cl.id AS cliente_id,
+        cl.nombre,
+        cl.cedula
+    FROM cuotas c
+    INNER JOIN prestamos p
+        ON p.id = c.prestamo_id
+    INNER JOIN clientes cl
+        ON p.cedula = cl.cedula
+    WHERE c.estado = 'Pendiente'
+      AND c.fecha_vencimiento >= CURDATE()
+      AND c.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
+    ORDER BY c.fecha_vencimiento ASC
+    LIMIT 5
+")->fetchAll(PDO::FETCH_ASSOC);
+
+
+/* ÚLTIMOS PAGOS */
 
 $sqlUltimosPagos = " SELECT
-    pa.fecha_pago,
-    pa.valor_pago,
-    pa.pago_capital,
-    pa.pago_mora,
-    pa.saldo_restante,
-    c.nombre,
-    p.cedula
-FROM pagos pa
-INNER JOIN prestamos p
-    ON pa.prestamo_id = p.id
-INNER JOIN clientes c
-    ON p.cedula = c.cedula
-ORDER BY pa.fecha_pago DESC
-LIMIT 10
+        pa.fecha_pago,
+        pa.valor_pago,
+        pa.pago_capital,
+        pa.pago_mora,
+        pa.saldo_restante,
+        c.nombre,
+        p.cedula
+    FROM pagos pa
+    INNER JOIN prestamos p
+        ON pa.prestamo_id = p.id
+    INNER JOIN clientes c
+        ON p.cedula = c.cedula
+    ORDER BY pa.fecha_pago DESC
+    LIMIT 10
 ";
 
 $stmt = $conexion->query($sqlUltimosPagos);
 $ultimosPagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+?>
 
-
-/* SALUDO SEGÚN HORA DEL DÍA 
-
+<!-- SALUDO SEGÚN HORA DEL DÍA 
+ 
 date_default_timezone_set("America/Bogota");
 
 $hora = date("H");
@@ -158,9 +190,8 @@ if($hora < 12){
 
     $saludo = "Buenas noches";
 
-}*/
+} -->
 
-?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -330,6 +361,154 @@ if($hora < 12){
 
     </div>
 
+    <!-- ACCIONES RÁPIDAS -->
+
+<div class="row mt-2 mb-4">
+
+    <div class="col-12">
+
+        <div class="quick-actions-card">
+
+            <div class="quick-actions-header">
+
+                <div>
+                    <span class="quick-actions-label">
+                        <i class="fa-solid fa-bolt"></i>
+                        Acceso rápido
+                    </span>
+
+                    <h4>Acciones rápidas</h4>
+
+                    <p>
+                        Accede directamente a las funciones principales
+                        de Capital Express.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="row g-3">
+
+                <!-- NUEVO PRÉSTAMO -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <a href="../index.php"
+                       class="quick-action">
+
+                        <div class="quick-action-icon">
+                            <i class="fa-solid fa-file-circle-plus"></i>
+                        </div>
+
+                        <div class="quick-action-content">
+
+                            <h5>Nuevo préstamo</h5>
+
+                            <span>
+                                Registrar un nuevo crédito
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+
+                    </a>
+
+                </div>
+
+
+                <!-- LISTADO DE PRÉSTAMOS -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <a href="../nuevo_prestamo.php"
+                       class="quick-action">
+
+                        <div class="quick-action-icon">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+
+                        <div class="quick-action-content">
+
+                            <h5>Préstamos</h5>
+
+                            <span>
+                                Consultar y gestionar créditos
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+
+                    </a>
+
+                </div>
+
+
+                <!-- GESTIONAR CLIENTES -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <a href="../gestionar_clientes.php"
+                       class="quick-action">
+
+                        <div class="quick-action-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+
+                        <div class="quick-action-content">
+
+                            <h5>Clientes</h5>
+
+                            <span>
+                                Consultar y gestionar clientes
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+
+                    </a>
+
+                </div>
+
+
+                <!-- REGISTRAR PAGO -->
+
+                <div class="col-xl-3 col-md-6">
+
+                    <a href="../listado.php"
+                       class="quick-action">
+
+                        <div class="quick-action-icon">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+
+                        <div class="quick-action-content">
+
+                            <h5>Registrar pago</h5>
+
+                            <span>
+                                Seleccionar un préstamo
+                            </span>
+
+                        </div>
+
+                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
     <div class="row mt-4">
 
         <div class="col-xl-3 col-md-6 mb-4">
@@ -473,37 +652,37 @@ if($hora < 12){
 
                     <tbody>
 
-<?php foreach ($ultimosPagos as $pago): ?>
+                        <?php foreach ($ultimosPagos as $pago): ?>
 
-<tr>
+                        <tr>
 
-    <td><?= htmlspecialchars($pago['nombre']) ?></td>
+                            <td><?= htmlspecialchars($pago['nombre']) ?></td>
 
-    <td><?= htmlspecialchars($pago['cedula']) ?></td>
+                            <td><?= htmlspecialchars($pago['cedula']) ?></td>
 
-    <td><?= date('d/m/Y H:i', strtotime($pago['fecha_pago'])) ?></td>
+                            <td><?= date('d/m/Y H:i', strtotime($pago['fecha_pago'])) ?></td>
 
-    <td class="text-end">
-        $<?= number_format($pago['pago_capital'], 0, ',', '.') ?>
-    </td>
+                            <td class="text-end">
+                                $<?= number_format($pago['pago_capital'], 0, ',', '.') ?>
+                            </td>
 
-    <td class="text-end text-danger">
-        $<?= number_format($pago['pago_mora'], 0, ',', '.') ?>
-    </td>
+                            <td class="text-end text-danger">
+                                $<?= number_format($pago['pago_mora'], 0, ',', '.') ?>
+                            </td>
 
-    <td class="text-end text-success fw-bold">
-        $<?= number_format($pago['valor_pago'], 0, ',', '.') ?>
-    </td>
+                            <td class="text-end text-success fw-bold">
+                                $<?= number_format($pago['valor_pago'], 0, ',', '.') ?>
+                            </td>
 
-    <td class="text-end">
-        $<?= number_format($pago['saldo_restante'], 0, ',', '.') ?>
-    </td>
+                            <td class="text-end">
+                                $<?= number_format($pago['saldo_restante'], 0, ',', '.') ?>
+                            </td>
 
-</tr>
+                        </tr>
 
-<?php endforeach; ?>
+                        <?php endforeach; ?>
 
-</tbody>
+                    </tbody>
 
                 </table>
 
@@ -513,61 +692,300 @@ if($hora < 12){
 
     </div>
 
-</div>
+</div>   
 
+<!-- PANEL DE ALERTAS INTELIGENTES -->
 
-    <div class="card shadow mt-4">
+<div class="card shadow mt-4">
 
-    <div class="card-header bg-danger text-white">
-        <h5 class="mb-0">⚠️ Alertas del sistema</h5>
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+        <h5 class="mb-0">
+            <i class="fa-solid fa-bell me-2"></i>
+            Alertas Inteligentes
+        </h5>
+
+        <?php
+
+        $totalAlertas =
+            count($clientesMora) +
+            count($cuotasVencidas) +
+            count($proximosVencimientos);
+
+        ?>
+
+        <?php if ($totalAlertas > 0): ?>
+
+            <span class="badge bg-danger">
+                <?= $totalAlertas ?> alerta<?= $totalAlertas != 1 ? 's' : '' ?>
+            </span>
+
+        <?php else: ?>
+
+            <span class="badge bg-success">
+                Todo al día
+            </span>
+
+        <?php endif; ?>
+
     </div>
+
 
     <div class="card-body">
 
-        <?php if(empty($clientesMora) && empty($cuotasVencidas)){ ?>
+
+        <!-- SIN ALERTAS -->
+
+        <?php if ($totalAlertas === 0): ?>
 
             <div class="alert alert-success mb-0">
-                No hay alertas pendientes.
-            </div>
 
-        <?php } ?>
+                <i class="fa-solid fa-circle-check me-2"></i>
 
-        <?php foreach($clientesMora as $cliente){ ?>
+                <strong>Todo está al día.</strong>
 
-            <div class="alert alert-danger">
-
-                <strong><?= htmlspecialchars($cliente['nombre']) ?></strong>
-
-                tiene un préstamo en mora.
-
-                <br>
-
-                Pendiente:
-                <strong>$<?= number_format($cliente['pendiente'],0,',','.') ?></strong>
+                No hay clientes en mora, cuotas vencidas
+                ni vencimientos próximos.
 
             </div>
 
-        <?php } ?>
+        <?php endif; ?>
 
-        <?php foreach($cuotasVencidas as $cuota){ ?>
 
-            <div class="alert alert-warning">
+        <!-- CLIENTES EN MORA -->
 
-                <?= htmlspecialchars($cuota['nombre']) ?>
+        <?php if (!empty($clientesMora)): ?>
 
-                tiene vencida la cuota
+            <div class="mb-4">
 
-                <strong>#<?= $cuota['numero_cuota'] ?></strong>
+                <h6 class="text-danger fw-bold mb-3">
 
-                desde
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
 
-                <strong><?= $cuota['fecha_vencimiento'] ?></strong>
+                    Clientes en mora
+
+                </h6>
+
+
+                <?php foreach ($clientesMora as $cliente): ?>
+
+                    <div class="alert alert-danger d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <strong>
+                                <?= htmlspecialchars($cliente['nombre']) ?>
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                Cédula:
+                                <?= htmlspecialchars($cliente['cedula']) ?>
+                            </small>
+
+                            <br>
+
+                            Pendiente:
+
+                            <strong>
+                                $<?= number_format($cliente['pendiente'], 0, ',', '.') ?>
+                            </strong>
+
+                            <?php if ($cliente['mora'] > 0): ?>
+
+                                <span class="ms-2">
+
+                                    Mora:
+
+                                    <strong>
+                                        $<?= number_format($cliente['mora'], 0, ',', '.') ?>
+                                    </strong>
+
+                                </span>
+
+                            <?php endif; ?>
+
+                        </div>
+
+
+                        <div>
+
+                            <a href="../prestamos/cartilla.php?id=<?= $cliente['prestamo_id'] ?>"
+                               class="btn btn-sm btn-danger">
+
+                                <i class="fa-solid fa-eye me-1"></i>
+
+                                Ver préstamo
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
 
             </div>
 
-        <?php } ?>
+        <?php endif; ?>
+
+
+        <!-- CUOTAS VENCIDAS -->
+
+        <?php if (!empty($cuotasVencidas)): ?>
+
+            <div class="mb-4">
+
+                <h6 class="text-warning fw-bold mb-3">
+
+                    <i class="fa-solid fa-calendar-xmark me-2"></i>
+
+                    Cuotas vencidas
+
+                </h6>
+
+
+                <?php foreach ($cuotasVencidas as $cuota): ?>
+
+                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <strong>
+                                <?= htmlspecialchars($cuota['nombre']) ?>
+                            </strong>
+
+                            <br>
+
+                            Cuota
+
+                            <strong>
+                                #<?= $cuota['numero_cuota'] ?>
+                            </strong>
+
+                            vencida desde
+
+                            <strong>
+                                <?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?>
+                            </strong>
+
+                            <br>
+
+                            <small>
+
+                                Valor cuota:
+
+                                <strong>
+                                    $<?= number_format($cuota['valor'], 0, ',', '.') ?>
+                                </strong>
+
+                            </small>
+
+                        </div>
+
+
+                        <div>
+
+                            <a href="../prestamos/cuotas.php?id=<?= $cuota['prestamo_id'] ?>"
+                               class="btn btn-sm btn-warning">
+
+                                <i class="fa-solid fa-calendar-days me-1"></i>
+
+                                Ver cuotas
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+        <?php endif; ?>
+
+
+        <!--  PRÓXIMOS VENCIMIENTOS-->
+
+        <?php if (!empty($proximosVencimientos)): ?>
+
+            <div>
+
+                <h6 class="text-primary fw-bold mb-3">
+
+                    <i class="fa-solid fa-clock me-2"></i>
+
+                    Próximos vencimientos
+
+                </h6>
+
+
+                <?php foreach ($proximosVencimientos as $cuota): ?>
+
+                    <div class="alert alert-primary d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <strong>
+                                <?= htmlspecialchars($cuota['nombre']) ?>
+                            </strong>
+
+                            <br>
+
+                            Cuota
+
+                            <strong>
+                                #<?= $cuota['numero_cuota'] ?>
+                            </strong>
+
+                            vence el
+
+                            <strong>
+                                <?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?>
+                            </strong>
+
+                            <br>
+
+                            <small>
+
+                                Valor:
+
+                                <strong>
+                                    $<?= number_format($cuota['valor'], 0, ',', '.') ?>
+                                </strong>
+
+                            </small>
+
+                        </div>
+
+
+                        <div>
+
+                            <a href="../prestamos/cuotas.php?id=<?= $cuota['prestamo_id'] ?>"
+                               class="btn btn-sm btn-primary">
+
+                                <i class="fa-solid fa-eye me-1"></i>
+
+                                Ver cuotas
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
+
+        <?php endif; ?>
+
 
     </div>
+
+</div>
 
 </div>
 
@@ -578,8 +996,6 @@ if($hora < 12){
 
 
 <script>
-
-
 const activos = <?= $activos ?>;
 const mora = <?= $mora ?>;
 const pagados = <?= $pagados ?>;
@@ -649,7 +1065,6 @@ new Chart(document.getElementById('graficaCircular'),{
     }
 
 });
-
 </script>
 
 
