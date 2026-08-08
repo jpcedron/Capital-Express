@@ -79,6 +79,14 @@ $totalPendiente = $conexion->query("
 ")->fetch(PDO::FETCH_ASSOC)['total'];
 
 
+// Porcentaje de recuperación de cartera
+$porcentajeRecuperacion = $totalPrestado > 0
+    ? ($totalRecuperado / $totalPrestado) * 100
+    : 0;
+
+$porcentajeRecuperacion = round($porcentajeRecuperacion, 1);
+
+
 /* ALERTAS INTELIGENTES */
 
 
@@ -509,71 +517,109 @@ if($hora < 12){
 
 </div>
 
+
+
+   <!-- INDICADORES FINANCIEROS -->
     <div class="row mt-4">
 
+        <!-- CAPITAL COLOCADO -->
+
         <div class="col-xl-3 col-md-6 mb-4">
 
             <div class="card-dashboard">
 
                 <div>
 
-                    <h6>Clientes</h6>
+                    <h6>Capital Colocado</h6>
 
-                    <h3><?php echo number_format($totalClientes); ?></h3>
+                    <h3>
+                        $<?= number_format($totalPrestado, 0, ',', '.') ?>
+                    </h3>
+
+                    <small>
+                        Total entregado en préstamos
+                    </small>
 
                 </div>
 
-                <i class="fa-solid fa-users"></i>
+                <i class="fa-solid fa-money-bill-transfer"></i>
 
             </div>
 
         </div>
 
+
+        <!-- CAPITAL RECUPERADO -->
+
         <div class="col-xl-3 col-md-6 mb-4">
 
             <div class="card-dashboard">
 
                 <div>
 
-                    <h6>Capital Prestado</h6>
+                    <h6>Capital Recuperado</h6>
 
-                    <h3>$<?php echo number_format($capitalPrestado, 0, ',', '.'); ?></h3>
+                    <h3>
+                        $<?= number_format($totalRecuperado, 0, ',', '.') ?>
+                    </h3>
+
+                    <small>
+                        Total abonado por clientes
+                    </small>
 
                 </div>
 
-                <i class="fa-solid fa-money-bill-wave"></i>
+                <i class="fa-solid fa-hand-holding-dollar"></i>
 
             </div>
 
         </div>
 
+
+        <!-- CAPITAL PENDIENTE -->
+
         <div class="col-xl-3 col-md-6 mb-4">
 
             <div class="card-dashboard">
 
                 <div>
 
-                    <h6>Total Recaudado</h6>
+                    <h6>Capital Pendiente</h6>
 
-                    <h3>$<?php echo number_format($totalPagado, 0, ',', '.'); ?></h3>
+                    <h3>
+                        $<?= number_format($totalPendiente, 0, ',', '.') ?>
+                    </h3>
+
+                    <small>
+                        Saldo pendiente por recuperar
+                    </small>
 
                 </div>
 
-                <i class="fa-solid fa-wallet"></i>
+                <i class="fa-solid fa-hourglass-half"></i>
 
             </div>
 
         </div>
 
+
+        <!-- MORA ACUMULADA -->
+
         <div class="col-xl-3 col-md-6 mb-4">
 
             <div class="card-dashboard">
 
                 <div>
 
-                    <h6>Mora</h6>
+                    <h6>Mora Acumulada</h6>
 
-                    <h3>$<?php echo number_format($totalMora, 0, ',', '.'); ?></h3>
+                    <h3>
+                        $<?= number_format($totalMora, 0, ',', '.') ?>
+                    </h3>
+
+                    <small>
+                        Valor total registrado en mora
+                    </small>
 
                 </div>
 
@@ -584,6 +630,71 @@ if($hora < 12){
         </div>
 
     </div>
+
+    
+    <!-- RECUPERACIÓN DE CARTERA -->
+<div class="row mb-4">
+
+    <div class="col-12">
+
+        <div class="card-dashboard recovery-card">
+
+            <div class="recovery-header">
+
+                <div>
+
+                    <div class="recovery-title">
+                        <i class="fa-solid fa-chart-line"></i>
+                        Recuperación de cartera
+                    </div>
+
+                    <p>
+                        Porcentaje del capital colocado que ha sido recuperado
+                    </p>
+
+                </div>
+
+                <div class="recovery-percentage">
+                    <?= number_format($porcentajeRecuperacion, 1, ',', '.') ?>%
+                </div>
+
+            </div>
+
+
+            <div class="recovery-progress">
+
+                <div
+                    class="recovery-progress-bar"
+                    style="width: <?= min($porcentajeRecuperacion, 100) ?>%;">
+                </div>
+
+            </div>
+
+
+            <div class="recovery-footer">
+
+                <span>
+                    <strong>
+                        $<?= number_format($totalRecuperado, 0, ',', '.') ?>
+                    </strong>
+                    recuperados
+                </span>
+
+                <span>
+                    de
+                    <strong>
+                        $<?= number_format($totalPrestado, 0, ',', '.') ?>
+                    </strong>
+                    colocados
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 
@@ -645,6 +756,9 @@ if($hora < 12){
                             <th>Cédula</th>
                             <th>Fecha</th>
                             <th>Valor</th>
+                            <th>Mora</th>
+                            <th>Saldo</th>
+                            <th>Saldo restante</th>
 
                         </tr>
 

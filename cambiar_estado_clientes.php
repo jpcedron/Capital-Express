@@ -2,38 +2,43 @@
 
 require_once "config/conexion.php";
 
-$conexion =
-(new Conexion())->conectar();
+$conexion = (new Conexion())->conectar();
 
-$id =
-$_GET['id'];
+if (
+    !isset($_GET['id']) ||
+    !isset($_GET['estado'])
+) {
+    header("Location: gestionar_clientes.php");
+    exit;
+}
 
-$estado =
-$_GET['estado'];
+$id = (int) $_GET['id'];
+$estado = $_GET['estado'];
 
-$sql = "
+// Solo permitimos estos dos estados
+if (!in_array($estado, ['activo', 'inactivo'], true)) {
+    header("Location: gestionar_clientes.php");
+    exit;
+}
 
-UPDATE prestamos
+try {
 
-SET estado_cliente=?
+    $sql = "UPDATE clientes
+            SET estado_cliente = ?
+            WHERE id = ?";
 
-WHERE id=?
+    $stmt = $conexion->prepare($sql);
 
-";
+    $stmt->execute([
+        $estado,
+        $id
+    ]);
 
-$stmt =
-$conexion->prepare($sql);
+    header("Location: gestionar_clientes.php");
+    exit;
 
-$stmt->execute([
+} catch (PDOException $e) {
 
-$estado,
+    die("Error al cambiar el estado del cliente: " . $e->getMessage());
 
-$id
-
-]);
-
-header(
-"Location: gestionar_clientes.php"
-);
-
-exit;
+}

@@ -2,26 +2,21 @@
 
 require_once "config/conexion.php";
 
-$conexion =
-(new Conexion())->conectar();
+$conexion = (new Conexion())->conectar();
 
-$sql = "
+$sql = "SELECT
+            id,
+            nombre,
+            cedula,
+            telefono,
+            direccion,
+            estado_cliente
+        FROM clientes
+        ORDER BY id DESC";
 
-SELECT *
-
-FROM prestamos
-
-ORDER BY id DESC
-
-";
-
-$stmt =
-$conexion->prepare($sql);
-
+$stmt = $conexion->prepare($sql);
 $stmt->execute();
-
-$clientes =
-$stmt->fetchAll(PDO::FETCH_ASSOC);
+$clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -177,11 +172,9 @@ $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 </div>
 
-
-                        
+                 
 <script src="/js/gestionar_cliente.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 
 </body>
 </html>

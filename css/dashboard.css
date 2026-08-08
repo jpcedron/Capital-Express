@@ -445,3 +445,92 @@ margin-top:15px;
     }
 
 }
+
+
+/* RECUPERACIÓN DE CARTERA */
+.recovery-card {
+    padding: 24px;
+}
+
+.recovery-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.recovery-title {
+    color: #0d1f3c;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.recovery-title i {
+    color: #c9a84c;
+    margin-right: 8px;
+}
+
+.recovery-header p {
+    margin: 5px 0 0;
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.recovery-percentage {
+    color: #0d1f3c;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.recovery-progress {
+    width: 100%;
+    height: 10px;
+    margin-top: 20px;
+
+    overflow: hidden;
+
+    background: #e9edf4;
+    border-radius: 20px;
+}
+
+.recovery-progress-bar {
+    height: 100%;
+
+    background: #c9a84c;
+
+    border-radius: 20px;
+
+    transition: width .5s ease;
+}
+
+.recovery-footer {
+    display: flex;
+    justify-content: space-between;
+
+    margin-top: 10px;
+
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.recovery-footer strong {
+    color: #0d1f3c;
+}
+
+@media (max-width: 576px) {
+
+    .recovery-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .recovery-percentage {
+        font-size: 26px;
+    }
+
+    .recovery-footer {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+}
