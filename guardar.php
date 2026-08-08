@@ -30,13 +30,16 @@ if ($cliente) {
 }
 
 
-/* registrar o actualizar cliente */
+/* REGISTRAR O ACTUALIZAR CLIENTE */
+$sqlCliente = "SELECT id, estado_cliente
+               FROM clientes
+               WHERE cedula = ?";
 
-$sqlCliente = "SELECT id FROM clientes WHERE cedula = ?";
 $stmtCliente = $conexion->prepare($sqlCliente);
 $stmtCliente->execute([$_POST['cedula']]);
 
 $clienteExiste = $stmtCliente->fetch(PDO::FETCH_ASSOC);
+
 
 if (!$clienteExiste) {
 
@@ -49,11 +52,12 @@ if (!$clienteExiste) {
         cedula,
         telefono,
         direccion,
-        password
+        password,
+        estado_cliente
     )
     VALUES
     (
-        ?,?,?,?,?
+        ?, ?, ?, ?, ?, 'activo'
     )";
 
     $stmtInsertar = $conexion->prepare($sqlInsertarCliente);
@@ -66,18 +70,21 @@ if (!$clienteExiste) {
         $password
     ]);
 
-
-exit;
+    // Obtener el ID del cliente recién creado
+    $cliente_id = $conexion->lastInsertId();
 
 } else {
 
-    // Si el cliente ya existe, actualizamos sus datos básicos
+    // ID del cliente existente
+    $cliente_id = $clienteExiste['id'];
+
+    // Actualizar datos básicos
     $sqlActualizar = "UPDATE clientes
-    SET
-        nombre = ?,
-        telefono = ?,
-        direccion = ?
-    WHERE cedula = ?";
+                      SET
+                          nombre = ?,
+                          telefono = ?,
+                          direccion = ?
+                      WHERE id = ?";
 
     $stmtActualizar = $conexion->prepare($sqlActualizar);
 
@@ -85,9 +92,8 @@ exit;
         $_POST['nombre'],
         $_POST['telefono'],
         $_POST['direccion'],
-        $_POST['cedula']
+        $cliente_id
     ]);
-
 }
 
 /* CALCULAR EL PRÉSTAMO */
@@ -115,6 +121,7 @@ $_POST["porcentaje_mora"] ?? 2;
 
 $sql = "INSERT INTO prestamos
 (
+cliente_id,
 nombre,
 cedula,
 telefono,
@@ -132,26 +139,27 @@ frecuencia
 )
 VALUES
 (
-?,?,?,?,?,?,?,?,?,?,?,?,?,?
+?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
 )";
 
 $stmt = $conexion->prepare($sql);
 
 $stmt->execute([
-$_POST['nombre'],
-$_POST['cedula'],
-$_POST['telefono'],
-$_POST['direccion'],
-$_POST['monto'],
-$_POST['interes'],
-$total_pagar,
-$_POST['cuotas'],
-$valor_cuota,
-date('Y-m-d'),
-$abonado,
-$pendiente,
-$porcentaje_mora,
-$_POST['frecuencia']
+    $cliente_id,
+    $_POST['nombre'],
+    $_POST['cedula'],
+    $_POST['telefono'],
+    $_POST['direccion'],
+    $_POST['monto'],
+    $_POST['interes'],
+    $total_pagar,
+    $_POST['cuotas'],
+    $valor_cuota,
+    date('Y-m-d'),
+    $abonado,
+    $pendiente,
+    $porcentaje_mora,
+    $_POST['frecuencia']
 ]);
 
 // ID del préstamo recién creado
@@ -263,7 +271,6 @@ if ($_POST['frecuencia'] == "Semanal") {
         }
     }
 }
-
 
 
 header("Location:listado.php");

@@ -4,71 +4,116 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$id = $_GET['id'];
 
+// Verificar ID del cliente
+if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+    die("Cliente no válido.");
+}
+
+$id_cliente = (int) $_GET['id'];
 
 
 try {
 
     $conexion->beginTransaction();
 
-    // Buscar la cédula del préstamo
-    $sql = "SELECT cedula FROM prestamos WHERE id = ?";
+
+    
+    // 1. Buscar el cliente
+    
+
+    $sql = "SELECT id, cedula
+            FROM clientes
+            WHERE id = ?";
+
     $stmt = $conexion->prepare($sql);
-    $stmt->execute([$id]);
+    $stmt->execute([$id_cliente]);
 
-    $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
+    $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$prestamo) {
-        throw new Exception("Préstamo no encontrado.");
+
+    if (!$cliente) {
+        throw new Exception("Cliente no encontrado.");
     }
 
-    $cedula = $prestamo['cedula'];
+
+    $cedula = $cliente['cedula'];
 
 
-    // Obtener todos los préstamos del cliente
-    $sql = "SELECT id FROM prestamos WHERE cedula = ?";
+    // 2. Buscar todos los préstamos del cliente
+    
+
+    $sql = "SELECT id
+            FROM prestamos
+            WHERE cedula = ?";
+
     $stmt = $conexion->prepare($sql);
     $stmt->execute([$cedula]);
 
     $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Eliminar pagos y cuotas de cada préstamo
+
+    
+    // 3. Eliminar pagos y cuotas
+    
+
     foreach ($prestamos as $prestamo) {
 
         $prestamo_id = $prestamo['id'];
 
+
         // Eliminar pagos
-        $sql = "DELETE FROM pagos WHERE prestamo_id = ?";
+        $sql = "DELETE FROM pagos
+                WHERE prestamo_id = ?";
+
         $stmt = $conexion->prepare($sql);
         $stmt->execute([$prestamo_id]);
 
+
         // Eliminar cuotas
-        $sql = "DELETE FROM cuotas WHERE prestamo_id = ?";
+        $sql = "DELETE FROM cuotas
+                WHERE prestamo_id = ?";
+
         $stmt = $conexion->prepare($sql);
         $stmt->execute([$prestamo_id]);
     }
 
-    // Eliminar todos los préstamos del cliente
-    $sql = "DELETE FROM prestamos WHERE cedula = ?";
+
+    
+    // 4. Eliminar préstamos
+    
+
+    $sql = "DELETE FROM prestamos
+            WHERE cedula = ?";
+
     $stmt = $conexion->prepare($sql);
     $stmt->execute([$cedula]);
 
 
+    
+    // 5. Eliminar cliente
+    
 
-    // Eliminar el cliente
-    $sql = "DELETE FROM clientes WHERE cedula = ?";
+    $sql = "DELETE FROM clientes
+            WHERE id = ?";
+
     $stmt = $conexion->prepare($sql);
-    $stmt->execute([$cedula]);
+    $stmt->execute([$id_cliente]);
 
+
+    // 6. Confirmar transacción 
     $conexion->commit();
+
 
     header("Location: gestionar_clientes.php");
     exit;
 
+
 } catch (Exception $e) {
 
-    $conexion->rollBack();
-    die($e->getMessage());
+    if ($conexion->inTransaction()) {
+        $conexion->rollBack();
+    }
 
+    die($e->getMessage());
 }

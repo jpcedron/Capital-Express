@@ -18,6 +18,8 @@ $stmt = $conexion->prepare($sql);
 $stmt->execute();
 $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
+
 ?>
 
 <!DOCTYPE html>
@@ -153,6 +155,13 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endif; ?>
 
                     <a
+                    href="editar_clientes.php?id=<?= $cliente['id'] ?>"
+                    class="btn btn-warning btn-sm"
+                    >
+                    Editar
+                    </a>
+
+                    <a
                     href="#"
                     class="btn btn-primary btn-sm"
                     onclick="eliminarCliente(<?= $cliente['id'] ?>)"
@@ -171,10 +180,36 @@ $clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </table>
 
 </div>
-
                  
 <script src="/js/gestionar_cliente.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!--ALERTA DE ELIMINACIÓN -->
+<?php if ($clienteEliminado): ?>
+
+<script>
+
+Swal.fire({
+    icon: 'success',
+    title: '¡Cliente eliminado!',
+    text: 'El cliente y toda su información relacionada fueron eliminados correctamente.',
+    confirmButtonText: 'Continuar',
+    allowOutsideClick: false
+}).then(() => {
+
+    // Limpiar el parámetro de la URL
+    window.history.replaceState(
+        {},
+        document.title,
+        'gestionar_clientes.php'
+    );
+
+});
+
+</script>
+
+<?php endif; ?>
 
 </body>
 </html>
