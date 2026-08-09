@@ -4,34 +4,12 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-/* VALIDAR SI YA EXISTE */
 
-$sqlBuscar = "SELECT estado
-              FROM prestamos
-              WHERE cedula = ?
-              ORDER BY id DESC
-              LIMIT 1";
+/* =========================================================
+   1. BUSCAR CLIENTE POR CÉDULA
+   ========================================================= */
 
-$stmtBuscar = $conexion->prepare($sqlBuscar);
-$stmtBuscar->execute([$_POST['cedula']]);
-
-$cliente = $stmtBuscar->fetch(PDO::FETCH_ASSOC);
-
-if ($cliente) {
-
-    if ($cliente['estado'] == "Activo" || $cliente['estado'] == "Mora") {
-
-        echo "<script>
-        alert('Este cliente ya tiene un préstamo activo y no puede registrar otro.');
-        window.location='index.php';
-        </script>";
-        exit;
-    }
-}
-
-
-/* REGISTRAR O ACTUALIZAR CLIENTE */
-$sqlCliente = "SELECT id, estado_cliente
+$sqlCliente = "SELECT id, nombre, cedula, telefono, direccion, estado_cliente
                FROM clientes
                WHERE cedula = ?";
 
@@ -40,6 +18,10 @@ $stmtCliente->execute([$_POST['cedula']]);
 
 $clienteExiste = $stmtCliente->fetch(PDO::FETCH_ASSOC);
 
+
+/* =========================================================
+   2. REGISTRAR CLIENTE SI NO EXISTE
+   ========================================================= */
 
 if (!$clienteExiste) {
 
@@ -70,15 +52,41 @@ if (!$clienteExiste) {
         $password
     ]);
 
-    // Obtener el ID del cliente recién creado
+    // ID del cliente recién creado
     $cliente_id = $conexion->lastInsertId();
+
+    // Un cliente nuevo queda activo
+    $estado_cliente = "activo";
+
 
 } else {
 
-    // ID del cliente existente
+    /* =====================================================
+       3. OBTENER CLIENTE EXISTENTE
+       ===================================================== */
+
     $cliente_id = $clienteExiste['id'];
 
-    // Actualizar datos básicos
+    $estado_cliente = strtolower(
+        trim($clienteExiste['estado_cliente'])
+    );
+
+
+    /* =====================================================
+       4. BLOQUEAR CLIENTES INACTIVOS
+       ===================================================== */
+
+    if ($estado_cliente === 'inactivo') {
+
+    header("Location: index.php?error=cliente_inactivo");
+    exit;
+}
+
+
+    /* =====================================================
+       5. ACTUALIZAR DATOS DEL CLIENTE
+       ===================================================== */
+
     $sqlActualizar = "UPDATE clientes
                       SET
                           nombre = ?,
@@ -96,11 +104,70 @@ if (!$clienteExiste) {
     ]);
 }
 
-/* CALCULAR EL PRÉSTAMO */
+
+    /* =====================================================
+       4. ACTUALIZAR DATOS BÁSICOS DEL CLIENTE
+       ===================================================== */
+
+    $sqlActualizar = "UPDATE clientes
+                      SET
+                          nombre = ?,
+                          telefono = ?,
+                          direccion = ?
+                      WHERE id = ?";
+
+    $stmtActualizar = $conexion->prepare($sqlActualizar);
+
+    $stmtActualizar->execute([
+        $_POST['nombre'],
+        $_POST['telefono'],
+        $_POST['direccion'],
+        $cliente_id
+    ]);
+
+
+
+/* =========================================================
+   5. VALIDAR SI EL CLIENTE YA TIENE PRÉSTAMO ACTIVO
+      AHORA USAMOS cliente_id
+   ========================================================= */
+
+$sqlBuscar = "SELECT estado
+              FROM prestamos
+              WHERE cliente_id = ?
+              ORDER BY id DESC
+              LIMIT 1";
+
+$stmtBuscar = $conexion->prepare($sqlBuscar);
+$stmtBuscar->execute([$cliente_id]);
+
+$prestamoExistente = $stmtBuscar->fetch(PDO::FETCH_ASSOC);
+
+
+if ($prestamoExistente) {
+
+    if (
+        $prestamoExistente['estado'] == "Activo" ||
+        $prestamoExistente['estado'] == "Mora"
+    ) {
+
+        echo "<script>
+            alert('Este cliente ya tiene un préstamo activo y no puede registrar otro.');
+            window.location='index.php';
+        </script>";
+
+        exit;
+    }
+}
+
+
+/* =========================================================
+   6. CALCULAR EL PRÉSTAMO
+   ========================================================= */
 
 $total_pagar =
-$_POST['monto'] +
-($_POST['monto'] * $_POST['interes'] / 100);
+    $_POST['monto'] +
+    ($_POST['monto'] * $_POST['interes'] / 100);
 
 $total_pagar = round($total_pagar, 2);
 
@@ -109,37 +176,40 @@ $abonado = 0;
 $pendiente = $total_pagar;
 
 $valor_cuota =
-round(
-    $total_pagar / $_POST['cuotas'],
-    2
-);
+    round(
+        $total_pagar / $_POST['cuotas'],
+        2
+    );
 
 $porcentaje_mora =
-$_POST["porcentaje_mora"] ?? 2;
+    $_POST["porcentaje_mora"] ?? 2;
 
-/* GUARDAR */
+
+/* =========================================================
+   7. GUARDAR PRÉSTAMO
+   ========================================================= */
 
 $sql = "INSERT INTO prestamos
 (
-cliente_id,
-nombre,
-cedula,
-telefono,
-direccion,
-monto,
-interes,
-total_pagar,
-cuotas,
-valor_cuota,
-fecha_prestamo,
-abonado,
-pendiente,
-porcentaje_mora,
-frecuencia
+    cliente_id,
+    nombre,
+    cedula,
+    telefono,
+    direccion,
+    monto,
+    interes,
+    total_pagar,
+    cuotas,
+    valor_cuota,
+    fecha_prestamo,
+    abonado,
+    pendiente,
+    porcentaje_mora,
+    frecuencia
 )
 VALUES
 (
-?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
 )";
 
 $stmt = $conexion->prepare($sql);
@@ -162,11 +232,18 @@ $stmt->execute([
     $_POST['frecuencia']
 ]);
 
+
 // ID del préstamo recién creado
 $prestamo_id = $conexion->lastInsertId();
 
+
+/* =========================================================
+   8. GENERAR CUOTAS AUTOMÁTICAMENTE
+   ========================================================= */
+
 // Fecha del préstamo
 $fecha = new DateTime(date('Y-m-d'));
+
 
 $sqlCuota = "INSERT INTO cuotas
 (prestamo_id, numero_cuota, fecha_vencimiento, valor)
@@ -174,19 +251,30 @@ VALUES (?,?,?,?)";
 
 $stmtCuota = $conexion->prepare($sqlCuota);
 
+
 $ultima_fecha = null;
+
+
+/* =========================================================
+   FRECUENCIA SEMANAL
+   ========================================================= */
 
 if ($_POST['frecuencia'] == "Semanal") {
 
     // Buscar el siguiente sábado
     $primerSabado = clone $fecha;
 
+
     if ($primerSabado->format('N') == 6) {
+
         // Si hoy es sábado, cobrar el siguiente sábado
         $primerSabado->modify('+7 days');
+
     } else {
+
         $primerSabado->modify('next saturday');
     }
+
 
     for ($i = 1; $i <= $_POST['cuotas']; $i++) {
 
@@ -202,6 +290,11 @@ if ($_POST['frecuencia'] == "Semanal") {
         $primerSabado->modify('+7 days');
     }
 
+
+/* =========================================================
+   FRECUENCIA QUINCENAL
+   ========================================================= */
+
 } else {
 
     // Lógica quincenal (15 y último día del mes)
@@ -209,6 +302,7 @@ if ($_POST['frecuencia'] == "Semanal") {
     $fechaCuota = clone $fecha;
 
     $dia = (int)$fechaCuota->format('d');
+
 
     if ($dia < 15) {
 
@@ -218,9 +312,11 @@ if ($_POST['frecuencia'] == "Semanal") {
             15
         );
 
+
     } else {
 
         $ultimoDia = $fechaCuota->format('t');
+
 
         if ($dia < $ultimoDia) {
 
@@ -230,9 +326,11 @@ if ($_POST['frecuencia'] == "Semanal") {
                 $ultimoDia
             );
 
+
         } else {
 
             $fechaCuota->modify('first day of next month');
+
             $fechaCuota->setDate(
                 $fechaCuota->format('Y'),
                 $fechaCuota->format('m'),
@@ -240,6 +338,7 @@ if ($_POST['frecuencia'] == "Semanal") {
             );
         }
     }
+
 
     for ($i = 1; $i <= $_POST['cuotas']; $i++) {
 
@@ -252,6 +351,7 @@ if ($_POST['frecuencia'] == "Semanal") {
 
         $ultima_fecha = $fechaCuota->format('Y-m-d');
 
+
         if ($fechaCuota->format('d') == 15) {
 
             $fechaCuota->setDate(
@@ -260,9 +360,11 @@ if ($_POST['frecuencia'] == "Semanal") {
                 $fechaCuota->format('t')
             );
 
+
         } else {
 
             $fechaCuota->modify('first day of next month');
+
             $fechaCuota->setDate(
                 $fechaCuota->format('Y'),
                 $fechaCuota->format('m'),
@@ -273,16 +375,9 @@ if ($_POST['frecuencia'] == "Semanal") {
 }
 
 
+/* =========================================================
+   9. REGRESAR AL LISTADO
+   ========================================================= */
+
 header("Location:listado.php");
 exit;
-
-/*
-$total_pagar =
-$_POST['monto'] +
-($_POST['monto'] * $_POST['interes'] / 100);
-$abonado = 0;
-$pendiente = $total_pagar;
-
-$valor_cuota =
-$total_pagar / $_POST['cuotas'];
-*/

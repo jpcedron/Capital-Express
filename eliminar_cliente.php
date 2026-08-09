@@ -18,10 +18,7 @@ try {
     $conexion->beginTransaction();
 
 
-    
     // 1. Buscar el cliente
-    
-
     $sql = "SELECT id, cedula
             FROM clientes
             WHERE id = ?";
@@ -105,7 +102,7 @@ try {
     $conexion->commit();
 
 
-    header("Location: gestionar_clientes.php");
+    header("Location: gestionar_clientes.php?eliminado=1");
     exit;
 
 

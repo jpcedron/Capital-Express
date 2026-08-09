@@ -4,7 +4,12 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$sql = " SELECT * FROM prestamos WHERE estado_cliente='activo' ORDER BY id DESC ";
+$sql = "SELECT prestamos.*
+        FROM prestamos
+        INNER JOIN clientes
+            ON prestamos.cliente_id = clientes.id
+        WHERE clientes.estado_cliente = 'activo'
+        ORDER BY prestamos.id DESC";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute();

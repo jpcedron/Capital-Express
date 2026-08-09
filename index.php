@@ -1,3 +1,14 @@
+<?php
+
+require_once "config/conexion.php";
+
+$conexion = (new Conexion())->conectar();
+
+$clienteInactivo = isset($_GET['error']) && $_GET['error'] === 'cliente_inactivo';
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -220,6 +231,20 @@
         });
     });
   </script>
+
+<!--alerta de cliente inactivo-->
+<?php if ($clienteInactivo): ?>
+
+<script>
+Swal.fire({
+    icon: 'warning',
+    title: 'Cliente inactivo',
+    text: 'Este cliente está inactivo y no puede recibir un nuevo préstamo.',
+    confirmButtonText: 'Entendido'
+});
+</script>
+
+<?php endif; ?>
 
 </body>
 </html>

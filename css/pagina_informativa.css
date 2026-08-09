@@ -8,6 +8,8 @@
     --ce-text:      #1e2a3a;
 }
 
+/* #1e2a3a,#f4f6fb,e8c876,#c9a84c,#1a3560,#0d1f3c */
+
 /* ── Tipografía base ── */
 body { font-family: 'Segoe UI', system-ui, 'Inter', sans-serif; color: var(--ce-text); background: var(--ce-light); }
 .brand-heading { font-family: 'Playfair Display', serif; }
