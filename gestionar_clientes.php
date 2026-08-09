@@ -34,9 +34,7 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
 <div class="container mt-5">
 
     <h2>Capital Express</h2>
-
     <p>Gestionar Clientes</p>
-
     <div class="d-flex justify-content-between align-items-center mb-3">
 
         <a
@@ -51,21 +49,13 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
     <table class="table table-bordered table-striped">
 
         <thead>
-
             <tr>
-
                 <th>ID</th>
-
                 <th>Nombre</th>
-
                 <th>Cédula</th>
-
                 <th>Teléfono</th>
-
                 <th>Estado Cliente</th>
-
                 <th>Acciones</th>
-
             </tr>
 
         </thead>
@@ -77,31 +67,22 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
             <tr>
 
                 <td>
-
                     <?= $cliente['id'] ?>
-
                 </td>
 
                 <td>
-
                     <?= $cliente['nombre'] ?>
-
                 </td>
 
                 <td>
-
                     <?= $cliente['cedula'] ?>
-
                 </td>
 
                 <td>
-
                     <?= $cliente['telefono'] ?>
-
                 </td>
 
                 <td>
-
                     <?php if(
                     $cliente['estado_cliente']
                     ==
@@ -123,11 +104,9 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
                         </span>
 
                     <?php endif; ?>
-
                 </td>
 
                 <td>
-
                     <?php if(
                     $cliente['estado_cliente']
                     ==
@@ -168,7 +147,6 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
                     >
                     Eliminar
                     </a>
-
                 </td>
 
             </tr>
