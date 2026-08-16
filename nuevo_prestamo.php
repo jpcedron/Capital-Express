@@ -24,6 +24,8 @@
 <div class="card-body">
 
 <form action="guardar.php" method="POST" id="formPrestamo">
+    
+<input type="hidden" name="cliente_id" id="cliente_id">
 
 <div class="row">
 
