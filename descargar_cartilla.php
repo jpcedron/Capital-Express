@@ -9,7 +9,17 @@ $conexion = (new Conexion())->conectar();
 
 $id = $_GET['id'];
 
-$sql = "SELECT * FROM prestamos WHERE id=?";
+$sql = "SELECT 
+            prestamos.*,
+            clientes.nombre AS cliente_nombre,
+            clientes.cedula AS cliente_cedula,
+            clientes.telefono AS cliente_telefono,
+            clientes.direccion AS cliente_direccion
+        FROM prestamos
+        INNER JOIN clientes
+            ON prestamos.cliente_id = clientes.id
+        WHERE prestamos.id = ?";
+
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
 
@@ -159,17 +169,17 @@ color:#888;
 
 <tr>
 <td class="titulo">Cliente</td>
-<td>'.$prestamo['nombre'].'</td>
+<td>'.htmlspecialchars($prestamo['cliente_nombre']).'</td>
 </tr>
 
 <tr>
 <td class="titulo">Cédula</td>
-<td>'.$prestamo['cedula'].'</td>
+<td>'.htmlspecialchars($prestamo['cliente_cedula']).'</td>
 </tr>
 
 <tr>
 <td class="titulo">Teléfono</td>
-<td>'.$prestamo['telefono'].'</td>
+<td>'.htmlspecialchars($prestamo['cliente_telefono']).'</td>
 </tr>
 
 <tr>
@@ -277,7 +287,7 @@ $pdf->setPaper("A4");
 $pdf->render();
 
 $pdf->stream(
-"cartilla_".$prestamo["nombre"].".pdf",
+"cartilla_".$prestamo["cliente_nombre"].".pdf",
 [
 "Attachment"=>true
 ]

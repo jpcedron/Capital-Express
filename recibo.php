@@ -6,7 +6,16 @@ $conexion = (new Conexion())->conectar();
 
 $id = $_GET['id'];
 
-$sql = "SELECT * FROM prestamos WHERE id = ?";
+$sql = "SELECT 
+            prestamos.*,
+            clientes.nombre AS nombre_cliente,
+            clientes.cedula,
+            clientes.telefono,
+            clientes.direccion
+        FROM prestamos
+        INNER JOIN clientes 
+            ON prestamos.cliente_id = clientes.id
+        WHERE prestamos.id = ?";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
@@ -57,7 +66,8 @@ $ultimaCuota = $stmt->fetch(PDO::FETCH_ASSOC);
             <div class="card-body">
                 
                 <div class="mb-3">
-                    <p class="mb-1"><strong>Cliente:</strong> <?= $prestamo['nombre']; ?></p>
+                    <p class="mb-1"><strong>Cliente:</strong> <?= htmlspecialchars($prestamo['nombre_cliente']); ?></p>
+                    <p class="mb-1"><strong>Cédula:</strong> <?= htmlspecialchars($prestamo['cedula']); ?></p>
                     <p class="mb-1"><strong>Monto:</strong> $<?= number_format($prestamo['monto'], 0, ',', '.'); ?></p>
                     <p class="mb-1"><strong>Interés:</strong> <?= $prestamo['interes']; ?>%</p>
                     <p class="mb-1"><strong>Fecha préstamo:</strong> <?= date("d/m/Y", strtotime($prestamo['fecha_prestamo'])); ?></p>

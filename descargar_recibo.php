@@ -5,36 +5,31 @@ require_once "config/conexion.php";
 
 use Dompdf\Dompdf;
 
-$conexion =
-(new Conexion())
-->conectar();
+$conexion = (new Conexion()) ->conectar();
 
-$id =
-$_GET["id"] ?? 0;
+$id = $_GET["id"] ?? 0;
 
-$sql="
+$sql = "
 
 SELECT
-p.*,
+    p.*,
+    c.nombre AS nombre_cliente,
+    c.cedula,
+    c.telefono,
+    c.direccion,
 
-(
-SELECT
-COALESCE(
-SUM(valor_pago),
-0
-)
-
-FROM pagos
-
-WHERE prestamo_id=p.id
-
-)
-
-AS total_pagado
+    (
+        SELECT COALESCE(SUM(valor_pago), 0)
+        FROM pagos
+        WHERE prestamo_id = p.id
+    ) AS total_pagado
 
 FROM prestamos p
 
-WHERE p.id=?
+INNER JOIN clientes c
+    ON p.cliente_id = c.id
+
+WHERE p.id = ?
 
 ";
 
@@ -154,7 +149,15 @@ Comprobante de Préstamo
 
 Cliente:
 
-<?= $prestamo["nombre"] ?>
+<?= htmlspecialchars($prestamo["nombre_cliente"]) ?>
+
+</div>
+
+<div class="linea">
+
+Cédula:
+
+<?= htmlspecialchars($prestamo["cedula"]) ?>
 
 </div>
 

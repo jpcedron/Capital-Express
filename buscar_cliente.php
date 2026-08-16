@@ -15,12 +15,39 @@ try {
 
     $cedula = trim($_GET['cedula']);
 
-    $sql = "SELECT *
-            FROM prestamos
-            WHERE cedula = ?
-            ORDER BY id DESC
-            LIMIT 1";
+   $sql = "SELECT
+            clientes.id AS cliente_id,
+            clientes.nombre,
+            clientes.cedula,
+            clientes.telefono,
+            clientes.direccion,
+            clientes.estado_cliente,
 
+            prestamos.id AS prestamo_id,
+            prestamos.monto,
+            prestamos.abonado,
+            prestamos.pendiente,
+            prestamos.mora,
+            prestamos.frecuencia,
+            prestamos.estado AS estado,
+
+            (
+                SELECT MAX(cuotas.fecha_vencimiento)
+                FROM cuotas
+                WHERE cuotas.prestamo_id = prestamos.id
+            ) AS fecha_limite
+
+        FROM clientes
+
+        LEFT JOIN prestamos
+            ON prestamos.cliente_id = clientes.id
+
+        WHERE clientes.cedula = ?
+
+        ORDER BY prestamos.id DESC
+
+        LIMIT 1";
+    
     $stmt = $conexion->prepare($sql);
     $stmt->execute([$cedula]);
 

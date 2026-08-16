@@ -4,7 +4,11 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$sql = "SELECT prestamos.*
+$sql = "SELECT 
+            prestamos.*,
+            clientes.nombre AS nombre_cliente,
+            clientes.cedula AS cedula_cliente,
+            clientes.telefono AS telefono_cliente
         FROM prestamos
         INNER JOIN clientes
             ON prestamos.cliente_id = clientes.id
@@ -119,13 +123,12 @@ $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <td class="cell-id">#<?= $prestamo['id'] ?></td>
 
               <td>
-                <span class="cell-name">
-                  <?= htmlspecialchars($prestamo['nombre']) ?>
-                  <small><?= htmlspecialchars($prestamo['cedula']) ?></small>
+                <span class="cell-name"><?= htmlspecialchars($prestamo['nombre_cliente']) ?>
+                  <small><?= htmlspecialchars($prestamo['cedula_cliente']) ?></small>
                 </span>
               </td>
 
-              <td><?= htmlspecialchars($prestamo['telefono']) ?></td>
+              <td><?= htmlspecialchars($prestamo['telefono_cliente']) ?></td>
 
               <td class="cell-amount">$<?= number_format($prestamo['monto']) ?></td>
 
@@ -162,15 +165,19 @@ $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <td>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                   <a href="cartilla.php?id=<?= $prestamo['id'] ?>"
-                     class="btn-action btn-action-cartilla">
+                    class="btn-action btn-action-cartilla">
                     <i class="bi bi-journal-text"></i> Cartilla
                   </a>
-                  <a href="registrar_pago.php?id=<?= $prestamo['id'] ?>"
-                     class="btn-action btn-action-pago">
-                    <i class="bi bi-cash-stack"></i> Pago
-                  </a>
+
+                  <?php if ($prestamo['estado'] !== 'Pagado'): ?>
+                    <a href="registrar_pago.php?id=<?= $prestamo['id'] ?>"
+                      class="btn-action btn-action-pago">
+                      <i class="bi bi-cash-stack"></i> Pago
+                    </a>
+                  <?php endif; ?>
+
                   <a href="historial_pagos.php?prestamo_id=<?= $prestamo['id'] ?>"
-                     class="btn-action btn-action-historial">
+                    class="btn-action btn-action-historial">
                     <i class="bi bi-clock-history"></i> Historial
                   </a>
                 </div>

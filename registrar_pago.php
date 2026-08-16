@@ -6,7 +6,15 @@ $conexion = (new Conexion())->conectar();
 
 $id = $_GET['id'];
 
-$sql = "SELECT * FROM prestamos WHERE id=?";
+$sql = "SELECT
+            prestamos.*,
+            clientes.nombre AS cliente_nombre,
+            clientes.cedula AS cliente_cedula
+        FROM prestamos
+        INNER JOIN clientes
+            ON prestamos.cliente_id = clientes.id
+        WHERE prestamos.id = ?";
+
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
 
@@ -79,7 +87,7 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
             <p class="field-group-title">Cliente</p>
 
             <p style="font-family:'Sora', sans-serif; font-weight:600; font-size:1.05rem; color:var(--navy-deep); margin:0 0 20px;">
-                <?= htmlspecialchars($prestamo['nombre']) ?>
+                <?= htmlspecialchars($prestamo['cliente_nombre']) ?>
             </p>
 
             <div class="summary-grid">
@@ -190,7 +198,7 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
                         <div class="modal-body-custom">
                             ¿Estás seguro de que deseas registrar este pago para el cliente
-                            <strong><?= htmlspecialchars($prestamo['nombre']) ?></strong>?
+                            <strong><?= htmlspecialchars($prestamo['cliente_nombre']) ?></strong>?
                         </div>
 
                         <div class="modal-footer modal-footer-custom">

@@ -55,7 +55,7 @@ if (!$clienteExiste) {
     // ID del cliente recién creado
     $cliente_id = $conexion->lastInsertId();
 
-    // Un cliente nuevo queda activo
+    // Cliente nuevo queda activo
     $estado_cliente = "activo";
 
 
@@ -73,14 +73,14 @@ if (!$clienteExiste) {
 
 
     /* =====================================================
-       4. BLOQUEAR CLIENTES INACTIVOS
+       4. BLOQUEAR CLIENTE INACTIVO
        ===================================================== */
 
     if ($estado_cliente === 'inactivo') {
 
-    header("Location: index.php?error=cliente_inactivo");
-    exit;
-}
+        header("Location: index.php?error=cliente_inactivo");
+        exit;
+    }
 
 
     /* =====================================================
@@ -105,30 +105,8 @@ if (!$clienteExiste) {
 }
 
 
-    /* =====================================================
-       4. ACTUALIZAR DATOS BÁSICOS DEL CLIENTE
-       ===================================================== */
-
-    $sqlActualizar = "UPDATE clientes
-                      SET
-                          nombre = ?,
-                          telefono = ?,
-                          direccion = ?
-                      WHERE id = ?";
-
-    $stmtActualizar = $conexion->prepare($sqlActualizar);
-
-    $stmtActualizar->execute([
-        $_POST['nombre'],
-        $_POST['telefono'],
-        $_POST['direccion'],
-        $cliente_id
-    ]);
-
-
-
 /* =========================================================
-   5. VALIDAR SI EL CLIENTE YA TIENE PRÉSTAMO ACTIVO
+   6. VALIDAR SI EL CLIENTE YA TIENE PRÉSTAMO ACTIVO
       AHORA USAMOS cliente_id
    ========================================================= */
 
@@ -147,8 +125,8 @@ $prestamoExistente = $stmtBuscar->fetch(PDO::FETCH_ASSOC);
 if ($prestamoExistente) {
 
     if (
-        $prestamoExistente['estado'] == "Activo" ||
-        $prestamoExistente['estado'] == "Mora"
+        $prestamoExistente['estado'] === "Activo" ||
+        $prestamoExistente['estado'] === "Mora"
     ) {
 
         echo "<script>
@@ -162,12 +140,16 @@ if ($prestamoExistente) {
 
 
 /* =========================================================
-   6. CALCULAR EL PRÉSTAMO
+   7. CALCULAR EL PRÉSTAMO
    ========================================================= */
 
+$monto = floatval($_POST['monto']);
+$interes = floatval($_POST['interes']);
+$numeroCuotas = intval($_POST['cuotas']);
+
 $total_pagar =
-    $_POST['monto'] +
-    ($_POST['monto'] * $_POST['interes'] / 100);
+    $monto +
+    ($monto * $interes / 100);
 
 $total_pagar = round($total_pagar, 2);
 
@@ -177,7 +159,7 @@ $pendiente = $total_pagar;
 
 $valor_cuota =
     round(
-        $total_pagar / $_POST['cuotas'],
+        $total_pagar / $numeroCuotas,
         2
     );
 
@@ -186,7 +168,7 @@ $porcentaje_mora =
 
 
 /* =========================================================
-   7. GUARDAR PRÉSTAMO
+   8. GUARDAR PRÉSTAMO
    ========================================================= */
 
 $sql = "INSERT INTO prestamos
@@ -220,10 +202,10 @@ $stmt->execute([
     $_POST['cedula'],
     $_POST['telefono'],
     $_POST['direccion'],
-    $_POST['monto'],
-    $_POST['interes'],
+    $monto,
+    $interes,
     $total_pagar,
-    $_POST['cuotas'],
+    $numeroCuotas,
     $valor_cuota,
     date('Y-m-d'),
     $abonado,
@@ -233,12 +215,15 @@ $stmt->execute([
 ]);
 
 
-// ID del préstamo recién creado
+/* =========================================================
+   9. OBTENER ID DEL PRÉSTAMO
+   ========================================================= */
+
 $prestamo_id = $conexion->lastInsertId();
 
 
 /* =========================================================
-   8. GENERAR CUOTAS AUTOMÁTICAMENTE
+   10. GENERAR CUOTAS AUTOMÁTICAMENTE
    ========================================================= */
 
 // Fecha del préstamo
@@ -252,18 +237,14 @@ VALUES (?,?,?,?)";
 $stmtCuota = $conexion->prepare($sqlCuota);
 
 
-$ultima_fecha = null;
-
-
 /* =========================================================
    FRECUENCIA SEMANAL
    ========================================================= */
 
-if ($_POST['frecuencia'] == "Semanal") {
+if ($_POST['frecuencia'] === "Semanal") {
 
     // Buscar el siguiente sábado
     $primerSabado = clone $fecha;
-
 
     if ($primerSabado->format('N') == 6) {
 
@@ -276,7 +257,7 @@ if ($_POST['frecuencia'] == "Semanal") {
     }
 
 
-    for ($i = 1; $i <= $_POST['cuotas']; $i++) {
+    for ($i = 1; $i <= $numeroCuotas; $i++) {
 
         $stmtCuota->execute([
             $prestamo_id,
@@ -284,8 +265,6 @@ if ($_POST['frecuencia'] == "Semanal") {
             $primerSabado->format('Y-m-d'),
             $valor_cuota
         ]);
-
-        $ultima_fecha = $primerSabado->format('Y-m-d');
 
         $primerSabado->modify('+7 days');
     }
@@ -297,7 +276,7 @@ if ($_POST['frecuencia'] == "Semanal") {
 
 } else {
 
-    // Lógica quincenal (15 y último día del mes)
+    // Lógica quincenal: día 15 y último día del mes
 
     $fechaCuota = clone $fecha;
 
@@ -306,6 +285,7 @@ if ($_POST['frecuencia'] == "Semanal") {
 
     if ($dia < 15) {
 
+        // Próxima fecha: día 15
         $fechaCuota->setDate(
             $fechaCuota->format('Y'),
             $fechaCuota->format('m'),
@@ -315,11 +295,12 @@ if ($_POST['frecuencia'] == "Semanal") {
 
     } else {
 
-        $ultimoDia = $fechaCuota->format('t');
+        $ultimoDia = (int)$fechaCuota->format('t');
 
 
         if ($dia < $ultimoDia) {
 
+            // Próxima fecha: último día del mes
             $fechaCuota->setDate(
                 $fechaCuota->format('Y'),
                 $fechaCuota->format('m'),
@@ -329,6 +310,7 @@ if ($_POST['frecuencia'] == "Semanal") {
 
         } else {
 
+            // Pasar al día 15 del siguiente mes
             $fechaCuota->modify('first day of next month');
 
             $fechaCuota->setDate(
@@ -340,7 +322,7 @@ if ($_POST['frecuencia'] == "Semanal") {
     }
 
 
-    for ($i = 1; $i <= $_POST['cuotas']; $i++) {
+    for ($i = 1; $i <= $numeroCuotas; $i++) {
 
         $stmtCuota->execute([
             $prestamo_id,
@@ -349,11 +331,10 @@ if ($_POST['frecuencia'] == "Semanal") {
             $valor_cuota
         ]);
 
-        $ultima_fecha = $fechaCuota->format('Y-m-d');
 
+        if ($fechaCuota->format('d') == '15') {
 
-        if ($fechaCuota->format('d') == 15) {
-
+            // Después del 15 viene el último día del mismo mes
             $fechaCuota->setDate(
                 $fechaCuota->format('Y'),
                 $fechaCuota->format('m'),
@@ -363,6 +344,7 @@ if ($_POST['frecuencia'] == "Semanal") {
 
         } else {
 
+            // Después del último día viene el 15 del siguiente mes
             $fechaCuota->modify('first day of next month');
 
             $fechaCuota->setDate(
@@ -376,8 +358,8 @@ if ($_POST['frecuencia'] == "Semanal") {
 
 
 /* =========================================================
-   9. REGRESAR AL LISTADO
+   11. REGRESAR AL LISTADO
    ========================================================= */
 
-header("Location:listado.php");
+header("Location: listado.php");
 exit;

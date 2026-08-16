@@ -12,7 +12,14 @@ $prestamo_id = $_GET['id'];
 
 /* Obtener información del préstamo */
 
-$sql = "SELECT * FROM prestamos WHERE id=?";
+$sql = "SELECT
+            prestamos.*,
+            clientes.nombre AS cliente_nombre,
+            clientes.cedula AS cliente_cedula
+        FROM prestamos
+        INNER JOIN clientes
+            ON prestamos.cliente_id = clientes.id
+        WHERE prestamos.id = ?";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$prestamo_id]);
@@ -79,7 +86,7 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <strong>Cliente</strong><br>
 
-                    <?= htmlspecialchars($prestamo['nombre']) ?>
+                    <?= htmlspecialchars($prestamo['cliente_nombre']) ?>
 
                 </div>
 
@@ -87,7 +94,7 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <strong>Cédula</strong><br>
 
-                    <?= htmlspecialchars($prestamo['cedula']) ?>
+                    <?= htmlspecialchars($prestamo['cliente_cedula']) ?>
 
                 </div>
 
@@ -264,5 +271,4 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 </body>
-
 </html>
