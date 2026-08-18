@@ -1,16 +1,363 @@
-body{
-    background:#f4f6f9;
+/* =========================================================
+   Capital Express — Nuevo Préstamo
+   Paleta: navy #1a3560 / #0d1f3c / #1e2a3a  |  gold #e8c876 / #c9a84c  |  bg #f4f6fb
+   ========================================================= */
+
+:root {
+  --ce-navy: #1a3560;
+  --ce-navy-deep: #0d1f3c;
+  --ce-slate: #1e2a3a;
+  --ce-bg: #f4f6fb;
+  --ce-gold: #e8c876;
+  --ce-gold-dark: #c9a84c;
+  --ce-white: #ffffff;
+  --ce-border: #e2e6ef;
+  --ce-radius: 14px;
+  --ce-font-heading: "Lexend", "Manrope", system-ui, sans-serif;
+  --ce-font-body: "Manrope", system-ui, sans-serif;
 }
 
-.card{
-    border:none;
-    border-radius:15px;
+body {
+  background-color: var(--ce-bg);
+  font-family: var(--ce-font-body);
+  color: var(--ce-slate);
 }
 
-.card-header{
-    border-radius:15px 15px 0 0 !important;
+
+/* ---------- Top brand bar ---------- */
+.ce-topbar {
+  background: var(--ce-navy-deep);
+  border-bottom: 3px solid var(--ce-gold);
 }
 
-#infoCliente{
-    display:none;
+
+.ce-topbar .ce-brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, var(--ce-gold) 0%, var(--ce-gold-dark) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ce-font-heading);
+  font-weight: 700;
+  color: var(--ce-navy-deep);
+  font-size: 1.05rem;
+  letter-spacing: -0.5px;
+}
+
+.ce-topbar .ce-brand-name {
+  font-family: var(--ce-font-heading);
+  font-weight: 600;
+  color: var(--ce-white);
+  font-size: 1.25rem;
+  letter-spacing: 0.2px;
+}
+
+
+.ce-topbar .ce-brand-tag {
+  color: #a9b7cf;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ce-topbar .nav-link {
+  color: #c7d2e6;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ce-topbar .nav-link.active,
+.ce-topbar .nav-link:hover {
+  background-color: rgba(232, 200, 118, 0.12);
+  color: var(--ce-gold);
+}
+
+/* ---------- Page header ---------- */
+.ce-page-title {
+  font-family: var(--ce-font-heading);
+  font-weight: 600;
+  color: var(--ce-navy-deep);
+  letter-spacing: -0.3px;
+}
+
+.ce-page-subtitle {
+  color: #6b7688;
+  font-size: 0.95rem;
+}
+
+.ce-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ce-gold-dark);
+}
+
+.ce-kicker::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  background: var(--ce-gold);
+  display: inline-block;
+}
+
+/* ---------- Main card ---------- */
+.ce-card {
+  background: var(--ce-white);
+  border: 1px solid var(--ce-border);
+  border-radius: var(--ce-radius);
+  box-shadow: 0 1px 2px rgba(13, 31, 60, 0.04), 0 12px 32px -16px rgba(13, 31, 60, 0.12);
+  overflow: hidden;
+}
+
+.ce-card-header {
+  background: linear-gradient(120deg, var(--ce-navy) 0%, var(--ce-navy-deep) 100%);
+  padding: 1.5rem 2rem;
+  position: relative;
+}
+
+.ce-card-header::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ce-gold) 0%, transparent 60%);
+}
+
+.ce-card-header h2 {
+  font-family: var(--ce-font-heading);
+  font-weight: 600;
+  color: var(--ce-white);
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.ce-card-header small {
+  color: #b9c5dc;
+  font-size: 0.85rem;
+}
+
+.ce-card-body {
+  padding: 2rem;
+}
+
+/* ---------- Section headings ---------- */
+.ce-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--ce-font-heading);
+  font-weight: 600;
+  font-size: 1.02rem;
+  color: var(--ce-navy-deep);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--ce-border);
+}
+
+.ce-section-title .ce-section-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(26, 53, 96, 0.07);
+  color: var(--ce-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.ce-section-title.is-loan .ce-section-icon {
+  background: rgba(232, 200, 118, 0.18);
+  color: var(--ce-gold-dark);
+}
+
+/* ---------- Form controls ---------- */
+.form-label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--ce-slate);
+  margin-bottom: 0.4rem;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid var(--ce-border);
+  border-radius: 9px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+  background-color: #fbfcfe;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--ce-navy);
+  box-shadow: 0 0 0 3px rgba(26, 53, 96, 0.12);
+  background-color: var(--ce-white);
+}
+
+.form-control[readonly] {
+  background-color: #eef1f7;
+  color: #6b7688;
+}
+
+/* Cédula search group */
+#cedula {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+#buscarCliente {
+  background-color: var(--ce-navy);
+  border-color: var(--ce-navy);
+  color: var(--ce-white);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding-inline: 1.1rem;
+  border-top-right-radius: 9px;
+  border-bottom-right-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background-color 0.15s ease;
+}
+
+#buscarCliente:hover {
+  background-color: var(--ce-navy-deep);
+}
+
+/* ---------- Client info panel ---------- */
+#infoCliente {
+  border-radius: 12px;
+  border: 1px solid var(--ce-border);
+  overflow: hidden;
+}
+
+#infoCliente .card-header {
+  padding: 0.9rem 1.25rem;
+  border-bottom: none;
+}
+
+#infoCliente .card-header h5 {
+  font-family: var(--ce-font-heading);
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#infoCliente .card-body {
+  background-color: #fafbfd;
+  padding: 1.35rem 1.25rem;
+}
+
+.ce-info-item {
+  margin-bottom: 1rem;
+}
+
+.ce-info-item:last-child {
+  margin-bottom: 0;
+}
+
+.ce-info-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8b96aa;
+  margin-bottom: 0.15rem;
+}
+
+.ce-info-value {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--ce-navy-deep);
+}
+
+/* Status color states applied via JS to #colorEstado */
+.ce-status-nuevo {
+  background-color: #6b7688;
+}
+
+.ce-status-activo {
+  background-color: var(--ce-navy);
+}
+
+.ce-status-mora {
+  background-color: #b3432b;
+}
+
+/* ---------- Divider ---------- */
+.ce-divider {
+  border: none;
+  border-top: 1px solid var(--ce-border);
+  margin: 2rem 0;
+}
+
+/* ---------- Actions ---------- */
+.ce-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+#btnGuardar {
+  background: linear-gradient(120deg, var(--ce-gold) 0%, var(--ce-gold-dark) 100%);
+  border: none;
+  color: var(--ce-navy-deep);
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.6rem;
+  border-radius: 9px;
+  box-shadow: 0 8px 20px -8px rgba(201, 168, 76, 0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+#btnGuardar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -8px rgba(201, 168, 76, 0.65);
+  color: var(--ce-navy-deep);
+}
+
+.ce-btn-secondary {
+  background-color: var(--ce-white);
+  border: 1px solid var(--ce-border);
+  color: var(--ce-slate);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 9px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.ce-btn-secondary:hover {
+  background-color: #f2f4f9;
+  border-color: #c7d0e0;
+  color: var(--ce-slate);
+}
+
+@media (max-width: 576px) {
+  .ce-card-body {
+    padding: 1.25rem;
+  }
+
+  .ce-actions {
+    flex-direction: column-reverse;
+  }
+
+  .ce-actions .btn {
+    width: 100%;
+  }
 }
