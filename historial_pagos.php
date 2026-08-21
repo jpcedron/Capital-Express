@@ -28,7 +28,9 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<?php /* Lógica PHP original sin modificar: se asume que $pagos ya viene definido desde el controlador */ ?>
+<?php  
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
