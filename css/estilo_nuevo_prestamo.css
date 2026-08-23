@@ -129,7 +129,7 @@ body {
   position: absolute;
   inset: auto 0 0 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--ce-gold) 0%, transparent 60%);
+  background: linear-gradient(120deg, var(--ce-navy) 0%, var(--ce-navy-deep) 100%);
 }
 
 .ce-card-header h2 {

@@ -215,972 +215,637 @@ if($hora < 12){
 </head>
 <body>
 
-<!-- Sidebar -->
-    <div class="sidebar">
+    <!-- Overlay para el menú en móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
 
         <h3 class="brand-heading">
-
             <i class="fa-solid fa-building-columns"></i>
-
             Capital Express
-
         </h3>
 
-            <a href="#">
+        <a href="#" class="active">
+            <i class="fa-solid fa-chart-line"></i>
+            Dashboard
+        </a>
 
-                <i class="fa-solid fa-chart-line"></i>
+        <a href="#">
+            <i class="fa-solid fa-users"></i>
+            Clientes
+        </a>
 
-                Dashboard
+        <a href="#">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            Préstamos
+        </a>
 
-            </a>
+        <a href="#">
+            <i class="fa-solid fa-wallet"></i>
+            Pagos
+        </a>
 
-            <a href="#">
+        <a href="#">
+            <i class="fa-solid fa-calendar-days"></i>
+            Cuotas
+        </a>
 
-                <i class="fa-solid fa-users"></i>
+        <a href="#">
+            <i class="fa-solid fa-file-lines"></i>
+            Reportes
+        </a>
 
-                Clientes
+        <a href="#">
+            <i class="fa-solid fa-gear"></i>
+            Configuración
+        </a>
 
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-money-bill-wave"></i>
-
-                Préstamos
-
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-wallet"></i>
-
-                Pagos
-
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-calendar-days"></i>
-
-                Cuotas
-
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-file-lines"></i>
-
-                Reportes
-
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-gear"></i>
-
-                Configuración
-
-            </a>
-
-            <a href="#">
-
-                <i class="fa-solid fa-right-from-bracket"></i>
-
-                Cerrar sesión
-
-            </a>
+        <a href="#">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Cerrar sesión
+        </a>
 
     </div>
 
     <!-- Topbar -->
     <div class="topbar">
 
-        <h4>
-
-        Panel Administrativo
-
-        </h4>
-
+        <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <h4>Panel Administrativo</h4>
+        </div>
 
         <div class="usuario">
-
             <i class="fa-solid fa-circle-user"></i>
-
             Administrador
-
-
         </div>
 
+    </div>
 
-        </div>
+    <!-- Contenido -->
+    <div class="contenido">
 
-        <!-- Contenido -->
-        <div class="contenido">
+        <div class="bienvenida">
 
-            <div class="bienvenida">
+            <h2>Bienvenido a Capital Express</h2>
 
-                <h2>
-
-                Bienvenido a Capital Express
-
-                </h2>
-
-                <p>
-
+            <p>
                 Desde este panel podrás administrar clientes, préstamos, pagos, cuotas y consultar toda la información del sistema.
+            </p>
 
-                </p>
+            <div class="row mt-2">
 
-        <div class="row mt-2">
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card-mini">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <h3><?= $prestamosActivos ?></h3>
-                    <span>Préstamos Activos</span>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card-mini">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <h3><?= $prestamosActivos ?></h3>
+                        <span>Préstamos Activos</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card-mini">
-                    <i class="fa-solid fa-handshake"></i>
-                    <h3><?= $prestamosPagados ?></h3>
-                    <span>Préstamos Pagados</span>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card-mini">
+                        <i class="fa-solid fa-handshake"></i>
+                        <h3><?= $prestamosPagados ?></h3>
+                        <span>Préstamos Pagados</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card-mini">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <h3><?= count($clientesMora) ?></h3>
-                    <span>Clientes en Mora</span>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card-mini">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <h3><?= count($clientesMora) ?></h3>
+                        <span>Clientes en Mora</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card-mini">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <h3><?= count($cuotasVencidas) ?></h3>
-                    <span>Cuotas Vencidas</span>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card-mini">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <h3><?= count($cuotasVencidas) ?></h3>
+                        <span>Cuotas Vencidas</span>
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
-    </div>
+        <!-- ACCIONES RÁPIDAS -->
+        <div class="row mt-2 mb-4">
 
-    <!-- ACCIONES RÁPIDAS -->
+            <div class="col-12">
 
-<div class="row mt-2 mb-4">
+                <div class="quick-actions-card">
 
-    <div class="col-12">
-
-        <div class="quick-actions-card">
-
-            <div class="quick-actions-header">
-
-                <div>
-                    <span class="quick-actions-label">
-                        <i class="fa-solid fa-bolt"></i>
-                        Acceso rápido
-                    </span>
-
-                    <h4>Acciones rápidas</h4>
-
-                    <p>
-                        Accede directamente a las funciones principales
-                        de Capital Express.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <div class="row g-3">
-
-                <!-- NUEVO PRÉSTAMO -->
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="../index.php"
-                       class="quick-action">
-
-                        <div class="quick-action-icon">
-                            <i class="fa-solid fa-file-circle-plus"></i>
-                        </div>
-
-                        <div class="quick-action-content">
-
-                            <h5>Nuevo préstamo</h5>
-
-                            <span>
-                                Registrar un nuevo crédito
+                    <div class="quick-actions-header">
+                        <div>
+                            <span class="quick-actions-label">
+                                <i class="fa-solid fa-bolt"></i>
+                                Acceso rápido
                             </span>
-
+                            <h4>Acciones rápidas</h4>
+                            <p>
+                                Accede directamente a las funciones principales de Capital Express.
+                            </p>
                         </div>
-
-                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
-
-                    </a>
-
-                </div>
-
-
-                <!-- LISTADO DE PRÉSTAMOS -->
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="../nuevo_prestamo.php"
-                       class="quick-action">
-
-                        <div class="quick-action-icon">
-                            <i class="fa-solid fa-clipboard-list"></i>
-                        </div>
-
-                        <div class="quick-action-content">
-
-                            <h5>Préstamos</h5>
-
-                            <span>
-                                Consultar y gestionar créditos
-                            </span>
-
-                        </div>
-
-                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
-
-                    </a>
-
-                </div>
-
-
-                <!-- GESTIONAR CLIENTES -->
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="../gestionar_clientes.php"
-                       class="quick-action">
-
-                        <div class="quick-action-icon">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-
-                        <div class="quick-action-content">
-
-                            <h5>Clientes</h5>
-
-                            <span>
-                                Consultar y gestionar clientes
-                            </span>
-
-                        </div>
-
-                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
-
-                    </a>
-
-                </div>
-
-
-                <!-- REGISTRAR PAGO -->
-
-                <div class="col-xl-3 col-md-6">
-
-                    <a href="../listado.php"
-                       class="quick-action">
-
-                        <div class="quick-action-icon">
-                            <i class="fa-solid fa-money-bill-transfer"></i>
-                        </div>
-
-                        <div class="quick-action-content">
-
-                            <h5>Registrar pago</h5>
-
-                            <span>
-                                Seleccionar un préstamo
-                            </span>
-
-                        </div>
-
-                        <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-   <!-- INDICADORES FINANCIEROS -->
-    <div class="row mt-4">
-
-        <!-- CAPITAL COLOCADO -->
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="card-dashboard">
-
-                <div>
-
-                    <h6>Capital Colocado</h6>
-
-                    <h3>
-                        $<?= number_format($totalPrestado, 0, ',', '.') ?>
-                    </h3>
-
-                    <small>
-                        Total entregado en préstamos
-                    </small>
-
-                </div>
-
-                <i class="fa-solid fa-money-bill-transfer"></i>
-
-            </div>
-
-        </div>
-
-
-        <!-- CAPITAL RECUPERADO -->
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="card-dashboard">
-
-                <div>
-
-                    <h6>Capital Recuperado</h6>
-
-                    <h3>
-                        $<?= number_format($totalRecuperado, 0, ',', '.') ?>
-                    </h3>
-
-                    <small>
-                        Total abonado por clientes
-                    </small>
-
-                </div>
-
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-
-            </div>
-
-        </div>
-
-
-        <!-- CAPITAL PENDIENTE -->
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="card-dashboard">
-
-                <div>
-
-                    <h6>Capital Pendiente</h6>
-
-                    <h3>
-                        $<?= number_format($totalPendiente, 0, ',', '.') ?>
-                    </h3>
-
-                    <small>
-                        Saldo pendiente por recuperar
-                    </small>
-
-                </div>
-
-                <i class="fa-solid fa-hourglass-half"></i>
-
-            </div>
-
-        </div>
-
-
-        <!-- MORA ACUMULADA -->
-
-        <div class="col-xl-3 col-md-6 mb-4">
-
-            <div class="card-dashboard">
-
-                <div>
-
-                    <h6>Mora Acumulada</h6>
-
-                    <h3>
-                        $<?= number_format($totalMora, 0, ',', '.') ?>
-                    </h3>
-
-                    <small>
-                        Valor total registrado en mora
-                    </small>
-
-                </div>
-
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    
-    <!-- RECUPERACIÓN DE CARTERA -->
-<div class="row mb-4">
-
-    <div class="col-12">
-
-        <div class="card-dashboard recovery-card">
-
-            <div class="recovery-header">
-
-                <div>
-
-                    <div class="recovery-title">
-                        <i class="fa-solid fa-chart-line"></i>
-                        Recuperación de cartera
                     </div>
 
-                    <p>
-                        Porcentaje del capital colocado que ha sido recuperado
-                    </p>
+                    <div class="row g-3">
+
+                        <!-- NUEVO PRÉSTAMO -->
+                        <div class="col-xl-3 col-md-6">
+                            <a href="../index.php" class="quick-action">
+                                <div class="quick-action-icon">
+                                    <i class="fa-solid fa-file-circle-plus"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h5>Nuevo préstamo</h5>
+                                    <span>Registrar un nuevo crédito</span>
+                                </div>
+                                <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+
+                        <!-- LISTADO DE PRÉSTAMOS -->
+                        <div class="col-xl-3 col-md-6">
+                            <a href="../nuevo_prestamo.php" class="quick-action">
+                                <div class="quick-action-icon">
+                                    <i class="fa-solid fa-clipboard-list"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h5>Préstamos</h5>
+                                    <span>Consultar y gestionar créditos</span>
+                                </div>
+                                <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+
+                        <!-- GESTIONAR CLIENTES -->
+                        <div class="col-xl-3 col-md-6">
+                            <a href="../gestionar_clientes.php" class="quick-action">
+                                <div class="quick-action-icon">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h5>Clientes</h5>
+                                    <span>Consultar y gestionar clientes</span>
+                                </div>
+                                <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+
+                        <!-- REGISTRAR PAGO -->
+                        <div class="col-xl-3 col-md-6">
+                            <a href="../listado.php" class="quick-action">
+                                <div class="quick-action-icon">
+                                    <i class="fa-solid fa-money-bill-transfer"></i>
+                                </div>
+                                <div class="quick-action-content">
+                                    <h5>Registrar pago</h5>
+                                    <span>Seleccionar un préstamo</span>
+                                </div>
+                                <i class="fa-solid fa-arrow-right quick-action-arrow"></i>
+                            </a>
+                        </div>
+
+                    </div>
 
                 </div>
-
-                <div class="recovery-percentage">
-                    <?= number_format($porcentajeRecuperacion, 1, ',', '.') ?>%
-                </div>
-
-            </div>
-
-
-            <div class="recovery-progress">
-
-                <div
-                    class="recovery-progress-bar"
-                    style="width: <?= min($porcentajeRecuperacion, 100) ?>%;">
-                </div>
-
-            </div>
-
-
-            <div class="recovery-footer">
-
-                <span>
-                    <strong>
-                        $<?= number_format($totalRecuperado, 0, ',', '.') ?>
-                    </strong>
-                    recuperados
-                </span>
-
-                <span>
-                    de
-                    <strong>
-                        $<?= number_format($totalPrestado, 0, ',', '.') ?>
-                    </strong>
-                    colocados
-                </span>
 
             </div>
 
         </div>
 
-    </div>
+        <!-- INDICADORES FINANCIEROS -->
+        <div class="row mt-4">
 
-</div>
+            <!-- CAPITAL COLOCADO -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card-dashboard">
+                    <div>
+                        <h6>Capital Colocado</h6>
+                        <h3>$<?= number_format($totalPrestado, 0, ',', '.') ?></h3>
+                        <small>Total entregado en préstamos</small>
+                    </div>
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+            </div>
 
+            <!-- CAPITAL RECUPERADO -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card-dashboard">
+                    <div>
+                        <h6>Capital Recuperado</h6>
+                        <h3>$<?= number_format($totalRecuperado, 0, ',', '.') ?></h3>
+                        <small>Total abonado por clientes</small>
+                    </div>
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                </div>
+            </div>
 
+            <!-- CAPITAL PENDIENTE -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card-dashboard">
+                    <div>
+                        <h6>Capital Pendiente</h6>
+                        <h3>$<?= number_format($totalPendiente, 0, ',', '.') ?></h3>
+                        <small>Saldo pendiente por recuperar</small>
+                    </div>
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+            </div>
 
-   <div class="row mt-4">
-
-    <div class="col-lg-8 mb-4">
-        <div class="card shadow-sm p-3">
-
-            <h5 class="mb-3">
-                <i class="fa-solid fa-chart-column text-primary"></i>
-                Préstamos por Estado
-            </h5>
-
-            <canvas id="graficaPrestamos"></canvas>
+            <!-- MORA ACUMULADA -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card-dashboard">
+                    <div>
+                        <h6>Mora Acumulada</h6>
+                        <h3>$<?= number_format($totalMora, 0, ',', '.') ?></h3>
+                        <small>Valor total registrado en mora</small>
+                    </div>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+            </div>
 
         </div>
-    </div>
 
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm p-3">
+        <!-- RECUPERACIÓN DE CARTERA -->
+        <div class="row mb-4">
 
-            <h5 class="mb-3">
-                <i class="fa-solid fa-chart-pie text-warning"></i>
-                Distribución
-            </h5>
+            <div class="col-12">
 
-            <canvas id="graficaCircular"></canvas>
+                <div class="card-dashboard recovery-card">
+
+                    <div class="recovery-header">
+                        <div>
+                            <div class="recovery-title">
+                                <i class="fa-solid fa-chart-line"></i>
+                                Recuperación de cartera
+                            </div>
+                            <p>Porcentaje del capital colocado que ha sido recuperado</p>
+                        </div>
+                        <div class="recovery-percentage">
+                            <?= number_format($porcentajeRecuperacion, 1, ',', '.') ?>%
+                        </div>
+                    </div>
+
+                    <div class="recovery-progress">
+                        <div class="recovery-progress-bar" style="width: <?= min($porcentajeRecuperacion, 100) ?>%;"></div>
+                    </div>
+
+                    <div class="recovery-footer">
+                        <span>
+                            <strong>$<?= number_format($totalRecuperado, 0, ',', '.') ?></strong>
+                            recuperados
+                        </span>
+                        <span>
+                            de
+                            <strong>$<?= number_format($totalPrestado, 0, ',', '.') ?></strong>
+                            colocados
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
-    </div>
 
-</div>
+        <!-- GRÁFICAS -->
+        <div class="row mt-4">
 
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="mb-3">
+                        <i class="fa-solid fa-chart-column text-primary"></i>
+                        Préstamos por Estado
+                    </h5>
+                    <canvas id="graficaPrestamos"></canvas>
+                </div>
+            </div>
 
-<div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm p-3">
+                    <h5 class="mb-3">
+                        <i class="fa-solid fa-chart-pie text-warning"></i>
+                        Distribución
+                    </h5>
+                    <canvas id="graficaCircular"></canvas>
+                </div>
+            </div>
 
-    <div class="col-12">
+        </div>
 
-        <div class="card shadow-sm">
+        <!-- ÚLTIMOS PAGOS -->
+        <div class="row">
 
-            <div class="card-header bg-white">
+            <div class="col-12">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fa-solid fa-money-bill-wave text-success"></i>
+                            Últimos pagos registrados
+                        </h5>
+                    </div>
+
+                    <div class="card-body table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Cédula</th>
+                                    <th>Fecha</th>
+                                    <th>Valor</th>
+                                    <th>Mora</th>
+                                    <th>Saldo</th>
+                                    <th>Saldo restante</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <?php foreach ($ultimosPagos as $pago): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($pago['nombre']) ?></td>
+                                    <td><?= htmlspecialchars($pago['cedula']) ?></td>
+                                    <td><?= date('d/m/Y H:i', strtotime($pago['fecha_pago'])) ?></td>
+                                    <td class="text-end">
+                                        $<?= number_format($pago['pago_capital'], 0, ',', '.') ?>
+                                    </td>
+                                    <td class="text-end text-danger">
+                                        $<?= number_format($pago['pago_mora'], 0, ',', '.') ?>
+                                    </td>
+                                    <td class="text-end text-success fw-bold">
+                                        $<?= number_format($pago['valor_pago'], 0, ',', '.') ?>
+                                    </td>
+                                    <td class="text-end">
+                                        $<?= number_format($pago['saldo_restante'], 0, ',', '.') ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PANEL DE ALERTAS INTELIGENTES -->
+        <div class="card shadow mt-4">
+
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
 
                 <h5 class="mb-0">
-                    <i class="fa-solid fa-money-bill-wave text-success"></i>
-                    Últimos pagos registrados
+                    <i class="fa-solid fa-bell me-2"></i>
+                    Alertas Inteligentes
                 </h5>
+
+                <?php
+                $totalAlertas =
+                    count($clientesMora) +
+                    count($cuotasVencidas) +
+                    count($proximosVencimientos);
+                ?>
+
+                <?php if ($totalAlertas > 0): ?>
+                    <span class="badge bg-danger">
+                        <?= $totalAlertas ?> alerta<?= $totalAlertas != 1 ? 's' : '' ?>
+                    </span>
+                <?php else: ?>
+                    <span class="badge bg-success">Todo al día</span>
+                <?php endif; ?>
 
             </div>
 
-            <div class="card-body table-responsive">
+            <div class="card-body">
 
-                <table class="table table-hover align-middle">
+                <!-- SIN ALERTAS -->
+                <?php if ($totalAlertas === 0): ?>
+                    <div class="alert alert-success mb-0">
+                        <i class="fa-solid fa-circle-check me-2"></i>
+                        <strong>Todo está al día.</strong>
+                        No hay clientes en mora, cuotas vencidas ni vencimientos próximos.
+                    </div>
+                <?php endif; ?>
 
-                    <thead>
+                <!-- CLIENTES EN MORA -->
+                <?php if (!empty($clientesMora)): ?>
+                    <div class="mb-4">
+                        <h6 class="text-danger fw-bold mb-3">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            Clientes en mora
+                        </h6>
 
-                        <tr>
-
-                            <th>Cliente</th>
-                            <th>Cédula</th>
-                            <th>Fecha</th>
-                            <th>Valor</th>
-                            <th>Mora</th>
-                            <th>Saldo</th>
-                            <th>Saldo restante</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        <?php foreach ($ultimosPagos as $pago): ?>
-
-                        <tr>
-
-                            <td><?= htmlspecialchars($pago['nombre']) ?></td>
-
-                            <td><?= htmlspecialchars($pago['cedula']) ?></td>
-
-                            <td><?= date('d/m/Y H:i', strtotime($pago['fecha_pago'])) ?></td>
-
-                            <td class="text-end">
-                                $<?= number_format($pago['pago_capital'], 0, ',', '.') ?>
-                            </td>
-
-                            <td class="text-end text-danger">
-                                $<?= number_format($pago['pago_mora'], 0, ',', '.') ?>
-                            </td>
-
-                            <td class="text-end text-success fw-bold">
-                                $<?= number_format($pago['valor_pago'], 0, ',', '.') ?>
-                            </td>
-
-                            <td class="text-end">
-                                $<?= number_format($pago['saldo_restante'], 0, ',', '.') ?>
-                            </td>
-
-                        </tr>
-
+                        <?php foreach ($clientesMora as $cliente): ?>
+                            <div class="alert alert-danger d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><?= htmlspecialchars($cliente['nombre']) ?></strong>
+                                    <br>
+                                    <small>Cédula: <?= htmlspecialchars($cliente['cedula']) ?></small>
+                                    <br>
+                                    Pendiente:
+                                    <strong>$<?= number_format($cliente['pendiente'], 0, ',', '.') ?></strong>
+                                    <?php if ($cliente['mora'] > 0): ?>
+                                        <span class="ms-2">
+                                            Mora:
+                                            <strong>$<?= number_format($cliente['mora'], 0, ',', '.') ?></strong>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <a href="listado.php?id=<?= $cliente['prestamo_id'] ?>" class="btn btn-sm btn-danger">
+                                        <i class="fa-solid fa-eye me-1"></i>
+                                        Ver préstamo
+                                    </a>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
-                    </tbody>
+                <!-- CUOTAS VENCIDAS -->
+                <?php if (!empty($cuotasVencidas)): ?>
+                    <div class="mb-4">
+                        <h6 class="text-warning fw-bold mb-3">
+                            <i class="fa-solid fa-calendar-xmark me-2"></i>
+                            Cuotas vencidas
+                        </h6>
 
-                </table>
+                        <?php foreach ($cuotasVencidas as $cuota): ?>
+                            <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><?= htmlspecialchars($cuota['nombre']) ?></strong>
+                                    <br>
+                                    Cuota
+                                    <strong>#<?= $cuota['numero_cuota'] ?></strong>
+                                    vencida desde
+                                    <strong><?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?></strong>
+                                    <br>
+                                    <small>
+                                        Valor cuota:
+                                        <strong>$<?= number_format($cuota['valor'], 0, ',', '.') ?></strong>
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fa-solid fa-calendar-days me-1"></i>
+                                        Ver cuotas
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <!-- PRÓXIMOS VENCIMIENTOS -->
+                <?php if (!empty($proximosVencimientos)): ?>
+                    <div>
+                        <h6 class="text-primary fw-bold mb-3">
+                            <i class="fa-solid fa-clock me-2"></i>
+                            Próximos vencimientos
+                        </h6>
+
+                        <?php foreach ($proximosVencimientos as $cuota): ?>
+                            <div class="alert alert-primary d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong><?= htmlspecialchars($cuota['nombre']) ?></strong>
+                                    <br>
+                                    Cuota
+                                    <strong>#<?= $cuota['numero_cuota'] ?></strong>
+                                    vence el
+                                    <strong><?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?></strong>
+                                    <br>
+                                    <small>
+                                        Valor:
+                                        <strong>$<?= number_format($cuota['valor'], 0, ',', '.') ?></strong>
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-eye me-1"></i>
+                                        Ver cuotas
+                                    </a>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
             </div>
 
         </div>
 
     </div>
-
-</div>   
-
-<!-- PANEL DE ALERTAS INTELIGENTES -->
-
-<div class="card shadow mt-4">
-
-    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-
-        <h5 class="mb-0">
-            <i class="fa-solid fa-bell me-2"></i>
-            Alertas Inteligentes
-        </h5>
-
-        <?php
-
-        $totalAlertas =
-            count($clientesMora) +
-            count($cuotasVencidas) +
-            count($proximosVencimientos);
-
-        ?>
-
-        <?php if ($totalAlertas > 0): ?>
-
-            <span class="badge bg-danger">
-                <?= $totalAlertas ?> alerta<?= $totalAlertas != 1 ? 's' : '' ?>
-            </span>
-
-        <?php else: ?>
-
-            <span class="badge bg-success">
-                Todo al día
-            </span>
-
-        <?php endif; ?>
-
-    </div>
-
-
-    <div class="card-body">
-
-
-        <!-- SIN ALERTAS -->
-
-        <?php if ($totalAlertas === 0): ?>
-
-            <div class="alert alert-success mb-0">
-
-                <i class="fa-solid fa-circle-check me-2"></i>
-
-                <strong>Todo está al día.</strong>
-
-                No hay clientes en mora, cuotas vencidas
-                ni vencimientos próximos.
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!-- CLIENTES EN MORA -->
-
-        <?php if (!empty($clientesMora)): ?>
-
-            <div class="mb-4">
-
-                <h6 class="text-danger fw-bold mb-3">
-
-                    <i class="fa-solid fa-triangle-exclamation me-2"></i>
-
-                    Clientes en mora
-
-                </h6>
-
-
-                <?php foreach ($clientesMora as $cliente): ?>
-
-                    <div class="alert alert-danger d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <strong>
-                                <?= htmlspecialchars($cliente['nombre']) ?>
-                            </strong>
-
-                            <br>
-
-                            <small>
-                                Cédula:
-                                <?= htmlspecialchars($cliente['cedula']) ?>
-                            </small>
-
-                            <br>
-
-                            Pendiente:
-
-                            <strong>
-                                $<?= number_format($cliente['pendiente'], 0, ',', '.') ?>
-                            </strong>
-
-                            <?php if ($cliente['mora'] > 0): ?>
-
-                                <span class="ms-2">
-
-                                    Mora:
-
-                                    <strong>
-                                        $<?= number_format($cliente['mora'], 0, ',', '.') ?>
-                                    </strong>
-
-                                </span>
-
-                            <?php endif; ?>
-
-                        </div>
-
-
-                        <div>
-
-                            <a href="listado.php?id=<?= $cliente['prestamo_id'] ?>"
-                               class="btn btn-sm btn-danger">
-
-                                <i class="fa-solid fa-eye me-1"></i>
-
-                                Ver préstamo
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!-- CUOTAS VENCIDAS -->
-
-        <?php if (!empty($cuotasVencidas)): ?>
-
-            <div class="mb-4">
-
-                <h6 class="text-warning fw-bold mb-3">
-
-                    <i class="fa-solid fa-calendar-xmark me-2"></i>
-
-                    Cuotas vencidas
-
-                </h6>
-
-
-                <?php foreach ($cuotasVencidas as $cuota): ?>
-
-                    <div class="alert alert-warning d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <strong>
-                                <?= htmlspecialchars($cuota['nombre']) ?>
-                            </strong>
-
-                            <br>
-
-                            Cuota
-
-                            <strong>
-                                #<?= $cuota['numero_cuota'] ?>
-                            </strong>
-
-                            vencida desde
-
-                            <strong>
-                                <?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?>
-                            </strong>
-
-                            <br>
-
-                            <small>
-
-                                Valor cuota:
-
-                                <strong>
-                                    $<?= number_format($cuota['valor'], 0, ',', '.') ?>
-                                </strong>
-
-                            </small>
-
-                        </div>
-
-
-                        <div>
-
-                            <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>"
-                               class="btn btn-sm btn-warning">
-
-                                <i class="fa-solid fa-calendar-days me-1"></i>
-
-                                Ver cuotas
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!--  PRÓXIMOS VENCIMIENTOS-->
-
-        <?php if (!empty($proximosVencimientos)): ?>
-
-            <div>
-
-                <h6 class="text-primary fw-bold mb-3">
-
-                    <i class="fa-solid fa-clock me-2"></i>
-
-                    Próximos vencimientos
-
-                </h6>
-
-
-                <?php foreach ($proximosVencimientos as $cuota): ?>
-
-                    <div class="alert alert-primary d-flex justify-content-between align-items-center">
-
-                        <div>
-
-                            <strong>
-                                <?= htmlspecialchars($cuota['nombre']) ?>
-                            </strong>
-
-                            <br>
-
-                            Cuota
-
-                            <strong>
-                                #<?= $cuota['numero_cuota'] ?>
-                            </strong>
-
-                            vence el
-
-                            <strong>
-                                <?= date('d/m/Y', strtotime($cuota['fecha_vencimiento'])) ?>
-                            </strong>
-
-                            <br>
-
-                            <small>
-
-                                Valor:
-
-                                <strong>
-                                    $<?= number_format($cuota['valor'], 0, ',', '.') ?>
-                                </strong>
-
-                            </small>
-
-                        </div>
-
-
-                        <div>
-
-                            <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>"
-                               class="btn btn-sm btn-primary">
-
-                                <i class="fa-solid fa-eye me-1"></i>
-
-                                Ver cuotas
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-    </div>
-
-</div>
-
-</div>
-
-</div>  
-
-</div>
-
-
+    <!-- /.contenido -->
 
 <script>
+/* ===== Menú móvil ===== */
+(function () {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const toggle  = document.getElementById('menuToggle');
+
+    function openMenu() {
+        sidebar.classList.add('open');
+        overlay.classList.add('show');
+    }
+    function closeMenu() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+    }
+
+    toggle.addEventListener('click', openMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    // Cerrar al elegir una opción del menú (en móvil)
+    sidebar.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= 991) closeMenu();
+        });
+    });
+
+    // Cerrar con la tecla Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+    });
+})();
+
+/* ===== Gráficas (paleta Capital Express) ===== */
 const activos = <?= $activos ?>;
-const mora = <?= $mora ?>;
+const mora    = <?= $mora ?>;
 const pagados = <?= $pagados ?>;
 
-new Chart(document.getElementById('graficaPrestamos'),{
+const COLOR_NAVY   = '#1a3560';  // Activos
+const COLOR_DANGER = '#c0392b';  // Mora
+const COLOR_GOLD   = '#c9a84c';  // Pagados
 
-    type:'bar',
-
-    data:{
-
-        labels:[
-            'Activos',
-            'En Mora',
-            'Pagados'
-        ],
-
-        datasets:[{
-
-            label:'Préstamos',
-
-            data:[
-                activos,
-                mora,
-                pagados
-            ]
-
+new Chart(document.getElementById('graficaPrestamos'), {
+    type: 'bar',
+    data: {
+        labels: ['Activos', 'En Mora', 'Pagados'],
+        datasets: [{
+            label: 'Préstamos',
+            data: [activos, mora, pagados],
+            backgroundColor: [COLOR_NAVY, COLOR_DANGER, COLOR_GOLD],
+            borderRadius: 8,
+            maxBarThickness: 70
         }]
-
     },
-
-    options:{
-
-        responsive:true,
-
-        plugins:{
-            legend:{
-                display:false
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { precision: 0, color: '#5b6b82' },
+                grid: { color: 'rgba(30,42,58,0.08)' }
+            },
+            x: {
+                ticks: { color: '#1e2a3a', font: { weight: '600' } },
+                grid: { display: false }
             }
         }
-
     }
-
 });
 
-new Chart(document.getElementById('graficaCircular'),{
-
-    type:'doughnut',
-
-    data:{
-
-        labels:[
-            'Activos',
-            'Mora',
-            'Pagados'
-        ],
-
-        datasets:[{
-
-            data:[
-                activos,
-                mora,
-                pagados
-            ]
-
+new Chart(document.getElementById('graficaCircular'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Activos', 'Mora', 'Pagados'],
+        datasets: [{
+            data: [activos, mora, pagados],
+            backgroundColor: [COLOR_NAVY, COLOR_DANGER, COLOR_GOLD],
+            borderColor: '#ffffff',
+            borderWidth: 3,
+            hoverOffset: 6
         }]
-
+    },
+    options: {
+        responsive: true,
+        cutout: '62%',
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: { color: '#1e2a3a', padding: 16, usePointStyle: true }
+            }
+        }
     }
-
 });
 </script>
-
 
 </body>
 </html>
