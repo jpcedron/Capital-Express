@@ -7,11 +7,12 @@ $conexion = (new Conexion())->conectar();
 
 $cedula = $_SESSION["cliente_cedula"];
 
-$sql = "SELECT *
-        FROM prestamos
-        WHERE cedula = ?
-        AND estado IN ('Activo','Mora')
-        ORDER BY id DESC
+$sql = "SELECT p.*
+        FROM prestamos p
+        INNER JOIN clientes c ON c.id = p.cliente_id
+        WHERE c.cedula = ?
+        AND p.estado IN ('Activo','Mora')
+        ORDER BY p.id DESC
         LIMIT 1";
 
 $stmt = $conexion->prepare($sql);
@@ -171,17 +172,12 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
-
 <title>Cartilla Capital Express</title>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../css/panel_de_usuario.css">
-
 </head>
 
 <body class="bg-light">

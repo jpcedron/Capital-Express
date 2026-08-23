@@ -7,11 +7,12 @@ $conexion = (new Conexion())->conectar();
 
 $cedula = $_SESSION["cliente_cedula"];
 
-$sql = "SELECT *
-        FROM prestamos
-        WHERE cedula = ?
-        AND estado IN ('Activo','Mora')
-        ORDER BY id DESC
+$sql = "SELECT p.*
+        FROM prestamos p
+        INNER JOIN clientes c ON c.id = p.cliente_id
+        WHERE c.cedula = ?
+        AND p.estado IN ('Activo','Mora')
+        ORDER BY p.id DESC
         LIMIT 1";
 
 $stmt = $conexion->prepare($sql);
