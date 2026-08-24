@@ -87,12 +87,13 @@ $porcentajeRecuperacion = $totalPrestado > 0
 $porcentajeRecuperacion = round($porcentajeRecuperacion, 1);
 
 
-/* ALERTAS INTELIGENTES */
 
+/* ALERTAS INTELIGENTES */
 
 /* 🔴 CLIENTES EN MORA */
 
-$clientesMora = $conexion->query(" SELECT 
+$clientesMora = $conexion->query("
+    SELECT 
         p.id AS prestamo_id,
         c.id AS cliente_id,
         c.nombre,
@@ -100,8 +101,8 @@ $clientesMora = $conexion->query(" SELECT
         p.pendiente,
         p.mora
     FROM prestamos p
-    INNER JOIN clientes c 
-        ON p.cedula = c.cedula
+    INNER JOIN clientes c
+        ON p.cliente_id = c.id
     WHERE p.estado = 'Mora'
     ORDER BY p.mora DESC
     LIMIT 5
@@ -110,7 +111,8 @@ $clientesMora = $conexion->query(" SELECT
 
 /* 🟠 CUOTAS VENCIDAS */
 
-$cuotasVencidas = $conexion->query(" SELECT
+$cuotasVencidas = $conexion->query("
+    SELECT
         c.id AS cuota_id,
         c.prestamo_id,
         c.numero_cuota,
@@ -123,7 +125,7 @@ $cuotasVencidas = $conexion->query(" SELECT
     INNER JOIN prestamos p
         ON p.id = c.prestamo_id
     INNER JOIN clientes cl
-        ON p.cedula = cl.cedula
+        ON p.cliente_id = cl.id
     WHERE c.estado = 'Pendiente'
       AND c.fecha_vencimiento < CURDATE()
     ORDER BY c.fecha_vencimiento ASC
@@ -134,7 +136,8 @@ $cuotasVencidas = $conexion->query(" SELECT
 /* 🟡 PRÓXIMOS VENCIMIENTOS
    Próximos 3 días */
 
-$proximosVencimientos = $conexion->query(" SELECT
+$proximosVencimientos = $conexion->query("
+    SELECT
         c.id AS cuota_id,
         c.prestamo_id,
         c.numero_cuota,
@@ -147,7 +150,7 @@ $proximosVencimientos = $conexion->query(" SELECT
     INNER JOIN prestamos p
         ON p.id = c.prestamo_id
     INNER JOIN clientes cl
-        ON p.cedula = cl.cedula
+        ON p.cliente_id = cl.id
     WHERE c.estado = 'Pendiente'
       AND c.fecha_vencimiento >= CURDATE()
       AND c.fecha_vencimiento <= DATE_ADD(CURDATE(), INTERVAL 3 DAY)
@@ -158,24 +161,26 @@ $proximosVencimientos = $conexion->query(" SELECT
 
 /* ÚLTIMOS PAGOS */
 
-$sqlUltimosPagos = " SELECT
+$sqlUltimosPagos = "
+    SELECT
         pa.fecha_pago,
         pa.valor_pago,
         pa.pago_capital,
         pa.pago_mora,
         pa.saldo_restante,
         c.nombre,
-        p.cedula
+        c.cedula
     FROM pagos pa
     INNER JOIN prestamos p
         ON pa.prestamo_id = p.id
     INNER JOIN clientes c
-        ON p.cedula = c.cedula
+        ON p.cliente_id = c.id
     ORDER BY pa.fecha_pago DESC
     LIMIT 10
 ";
 
 $stmt = $conexion->query($sqlUltimosPagos);
+
 $ultimosPagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

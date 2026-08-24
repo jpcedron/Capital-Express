@@ -170,14 +170,9 @@ $porcentaje_mora =
 /* =========================================================
    8. GUARDAR PRÉSTAMO
    ========================================================= */
-
 $sql = "INSERT INTO prestamos
 (
     cliente_id,
-    nombre,
-    cedula,
-    telefono,
-    direccion,
     monto,
     interes,
     total_pagar,
@@ -191,17 +186,13 @@ $sql = "INSERT INTO prestamos
 )
 VALUES
 (
-    ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+    ?,?,?,?,?,?,?,?,?,?,?
 )";
 
 $stmt = $conexion->prepare($sql);
 
 $stmt->execute([
     $cliente_id,
-    $_POST['nombre'],
-    $_POST['cedula'],
-    $_POST['telefono'],
-    $_POST['direccion'],
     $monto,
     $interes,
     $total_pagar,

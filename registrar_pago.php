@@ -54,9 +54,9 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 <div class="page-wrap">
 
     <div class="breadcrumb-row">
-        <a href="pagina_web/dashboard.php">Panel</a>
+        <a href="public/dashboard.php">Panel</a>
         <span class="sep">/</span>
-        <a href="listado.php">Préstamos</a>
+        <a href="public/listado.php">Préstamos</a>
         <span class="sep">/</span>
         <span class="current">Registrar pago</span>
     </div>
@@ -164,7 +164,7 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
                     <button
                         type="button"
                         class="btn btn-cancel"
-                        onclick="window.location.href='listado.php'"
+                        onclick="window.location.href='public/listado.php'"
                     >
                         Listado
                     </button>

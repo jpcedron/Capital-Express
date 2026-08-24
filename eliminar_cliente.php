@@ -1,7 +1,6 @@
 <?php
 
 require_once "config/conexion.php";
-
 $conexion = (new Conexion())->conectar();
 
 
@@ -17,9 +16,8 @@ try {
 
     $conexion->beginTransaction();
 
-
-    // 1. Buscar el cliente
-    $sql = "SELECT id, cedula
+    // 1. Verificar que el cliente exista
+    $sql = "SELECT id
             FROM clientes
             WHERE id = ?";
 
@@ -34,25 +32,20 @@ try {
     }
 
 
-    $cedula = $cliente['cedula'];
-
-
     // 2. Buscar todos los préstamos del cliente
-    
+    // Ahora usamos cliente_id en lugar de prestamos.cedula
 
     $sql = "SELECT id
             FROM prestamos
-            WHERE cedula = ?";
+            WHERE cliente_id = ?";
 
     $stmt = $conexion->prepare($sql);
-    $stmt->execute([$cedula]);
+    $stmt->execute([$id_cliente]);
 
     $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-    
-    // 3. Eliminar pagos y cuotas
-    
+    // 3. Eliminar pagos y cuotas de cada préstamo
 
     foreach ($prestamos as $prestamo) {
 
@@ -76,20 +69,17 @@ try {
     }
 
 
-    
-    // 4. Eliminar préstamos
-    
+    // 4. Eliminar préstamos del cliente
+    // Ahora usamos cliente_id
 
     $sql = "DELETE FROM prestamos
-            WHERE cedula = ?";
+            WHERE cliente_id = ?";
 
     $stmt = $conexion->prepare($sql);
-    $stmt->execute([$cedula]);
+    $stmt->execute([$id_cliente]);
 
 
-    
     // 5. Eliminar cliente
-    
 
     $sql = "DELETE FROM clientes
             WHERE id = ?";
@@ -98,7 +88,8 @@ try {
     $stmt->execute([$id_cliente]);
 
 
-    // 6. Confirmar transacción 
+    // 6. Confirmar transacción
+
     $conexion->commit();
 
 

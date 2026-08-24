@@ -7,9 +7,16 @@ $conexion = (new Conexion())->conectar();
 
 $cedula = $_SESSION["cliente_cedula"];
 
-$sql = "SELECT p.*
+$sql = "SELECT
+            p.*,
+            c.nombre AS cliente_nombre,
+            c.cedula AS cliente_cedula,
+            c.telefono AS cliente_telefono,
+            c.direccion AS cliente_direccion,
+            c.estado_cliente
         FROM prestamos p
-        INNER JOIN clientes c ON c.id = p.cliente_id
+        INNER JOIN clientes c
+            ON c.id = p.cliente_id
         WHERE c.cedula = ?
         AND p.estado IN ('Activo','Mora')
         ORDER BY p.id DESC
@@ -203,19 +210,19 @@ Préstamos Financieros
 <hr>
 
 <p><strong>Nombre:</strong>
-<?= $prestamo['nombre'] ?>
+<?= htmlspecialchars($prestamo['cliente_nombre']) ?>
 </p>
 
 <p><strong>Cédula:</strong>
-<?= $prestamo['cedula'] ?>
+<?= htmlspecialchars($prestamo['cliente_cedula']) ?>
 </p>
 
 <p><strong>Teléfono:</strong>
-<?= $prestamo['telefono'] ?>
+<?= htmlspecialchars($prestamo['cliente_telefono']) ?>
 </p>
 
 <p><strong>Dirección:</strong>
-<?= $prestamo['direccion'] ?>
+<?= htmlspecialchars($prestamo['cliente_direccion']) ?>
 </p>
 
 <hr>
