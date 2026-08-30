@@ -47,130 +47,141 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de Cuotas</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<link rel="stylesheet" href="../css/panel_de_usuario.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Cuotas · Capital Express</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/cuotas_cliente.css">
 </head>
-<body class="bg-light">
+<body class="ce-body">
 
-<div class="container py-4">
+<!-- ===== NAVBAR ===== -->
+<nav class="ce-navbar">
+    <div class="ce-navbar__inner">
+        <a href="panel_de_usuario.php" class="ce-navbar__brand">
+            <div class="brand-icon brand-heading">CE</div>
+            <div class="brand-text">
+                <div class="name">Capital Express</div>
+                <div class="tagline">Gestión de Préstamos</div>
+            </div>
+        </a>
 
-    <div class="card shadow">
+        <a href="panel_de_usuario.php" class="ce-navbar__back">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Panel</span>
+        </a>
+    </div>
+</nav>
 
-        <div class="card-header text-white" style="background: linear-gradient(135deg, #0d1f3c, #1a3560); text-align: center;">
+<div class="container ce-container">
 
-            <h4 class="mb-0">
+    <div class="ce-card">
 
-                Historial de Cuotas
-
-            </h4>
-
+        <!-- Encabezado -->
+        <div class="ce-header">
+            <div class="ce-header__brand">
+                <div class="ce-header__mark"><i class="bi bi-clock-history"></i></div>
+                <div>
+                    <h1 class="ce-brand">Historial de Cuotas</h1>
+                    <p class="ce-header__subtitle">Detalle completo de vencimientos y pagos</p>
+                </div>
+            </div>
+            <span class="ce-status ce-status--header">
+                <i class="bi bi-list-ol"></i>
+                <?= count($cuotas); ?> cuotas
+            </span>
         </div>
 
-        <div class="card-body">
+        <!-- Cuerpo -->
+        <div class="ce-body-inner">
 
-            <div class="table-responsive">
+            <div class="ce-section">
+                <div class="ce-section__title">
+                    <i class="bi bi-calendar2-check"></i>
+                    <h2>Cronograma de pagos</h2>
+                </div>
 
-                <table class="table table-bordered table-hover align-middle">
-
-                    <thead class="table-secondary">
-
-                        <tr>
-                            <th>#</th>
-                            <th>Fecha Vencimiento</th>
-                            <th>Valor</th>
-                            <th>Estado</th>
-                            <th>Días Atraso</th>
-                            <th>Mora</th>
-                            <th>Fecha Pago</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    <?php foreach($cuotas as $c): ?>
-
-                        <tr>
-
-                            <td><?= $c['numero_cuota']; ?></td>
-
-                            <td><?= $c['fecha_vencimiento']; ?></td>
-
-                            <td>$<?= number_format($c['valor'],0,",","."); ?></td>
-
-                            <td>
-
-                            <?php
-
-                            if($c['pagada']){
-
-                                echo '<span class="badge bg-success">Pagada</span>';
-
-                            }else{
-
-                                echo '<span class="badge bg-warning text-dark">Pendiente</span>';
-
-                            }
-
-                            ?>
-
-                            </td>
-
-                            <td><?= $c['dias_atraso']; ?></td>
-
-                            <td>
-
-                                $<?= number_format($c['mora'],0,",","."); ?>
-
-                            </td>
-
-                            <td>
-
-                                <?php
-
-                                if($c['fecha_pago']){
-
-                                    echo $c['fecha_pago'];
-
-                                }else{
-
-                                    echo "-";
-
-                                }
-
-                                ?>
-
-                            </td>
-
-                        </tr>
-
-                    <?php endforeach; ?>
-
-                    </tbody>
-
-                </table>
-
+                <div class="ce-table-wrap">
+                    <table class="ce-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Vencimiento</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                                <th>Días atraso</th>
+                                <th>Mora</th>
+                                <th>Fecha pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php if (empty($cuotas)): ?>
+                            <tr>
+                                <td colspan="7" class="ce-empty">
+                                    <i class="bi bi-inbox"></i>
+                                    No hay cuotas registradas.
+                                </td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($cuotas as $c): ?>
+                                <tr>
+                                    <td data-label="#">
+                                        <span class="ce-num"><?= $c['numero_cuota']; ?></span>
+                                    </td>
+                                    <td data-label="Vencimiento"><?= $c['fecha_vencimiento']; ?></td>
+                                    <td data-label="Valor">
+                                        <span class="ce-money">$<?= number_format($c['valor'], 0, ",", "."); ?></span>
+                                    </td>
+                                    <td data-label="Estado">
+                                        <?php if ($c['pagada']): ?>
+                                            <span class="ce-pill is-paid"><i class="bi bi-check-circle-fill"></i> Pagada</span>
+                                        <?php else: ?>
+                                            <span class="ce-pill is-pending"><i class="bi bi-hourglass-split"></i> Pendiente</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Días atraso">
+                                        <?php if ((int)$c['dias_atraso'] > 0): ?>
+                                            <span class="ce-late-days"><?= $c['dias_atraso']; ?></span>
+                                        <?php else: ?>
+                                            <span class="ce-dash">0</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Mora">
+                                        <?php if ((int)$c['mora'] > 0): ?>
+                                            <span class="ce-money" style="color: var(--ce-bad);">$<?= number_format($c['mora'], 0, ",", "."); ?></span>
+                                        <?php else: ?>
+                                            <span class="ce-dash">$0</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Fecha pago">
+                                        <?php if ($c['fecha_pago']): ?>
+                                            <?= $c['fecha_pago']; ?>
+                                        <?php else: ?>
+                                            <span class="ce-dash">—</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="text-end mt-4">
-
-                <a href="panel_de_usuario.php" class="btn-ce">
+            <!-- Acciones -->
+            <div class="ce-actions">
+                <a href="panel_de_usuario.php" class="btn-ce btn-ce--ghost">
                     <i class="bi bi-arrow-left-circle"></i>
                     Regresar al Panel
                 </a>
-                
             </div>
 
         </div>
-
     </div>
 
 </div>
 
 </body>
-
 </html>

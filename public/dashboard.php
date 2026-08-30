@@ -706,9 +706,8 @@ if($hora < 12){
                                     </small>
                                 </div>
                                 <div>
-                                    <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-warning">
-                                        <i class="fa-solid fa-calendar-days me-1"></i>
-                                        Ver cuotas
+                                    <a href="../cuotas.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-warning">
+                                        <i class="fa-solid fa-calendar-days me-1"></i>Ver cuotas 
                                     </a>
                                 </div>
                             </div>
@@ -740,9 +739,8 @@ if($hora < 12){
                                     </small>
                                 </div>
                                 <div>
-                                    <a href="listado.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-primary">
-                                        <i class="fa-solid fa-eye me-1"></i>
-                                        Ver cuotas
+                                    <a href="../cuotas.php?id=<?= $cuota['prestamo_id'] ?>" class="btn btn-sm btn-primary">
+                                        <i class="fa-solid fa-calendar-days me-1"></i> Ver cuotas
                                     </a>
                                 </div>
                             </div>

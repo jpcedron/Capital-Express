@@ -49,105 +49,122 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Control de Cuotas</title>
+<title>Control de Cuotas · Capital Express</title>
 <!-- Bootstrap 5.3 + Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-<!-- Tipografías del sistema de diseño -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Tipografías del sistema de diseño (idénticas a la cartilla) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-<!-- Estilos Control de Cuotas -->
-<link rel="stylesheet" href="../css/cuotas.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<!-- Base compartida con la cartilla + extras de cuotas -->
+<link rel="stylesheet" href="css/cartilla.css">
+<link rel="stylesheet" href="css/cuotas.css">
 </head>
 
-<body class="cuotas-page">
+<body>
 
-<div class="container py-4">
+<!-- ===== TOP BAR (igual a la cartilla) ===== -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="brand-row">
+            <div class="brand-mark brand-heading">CE</div>
+            <div>
+                <p class="brand-name brand-heading">Capital Express</p>
+                <p class="brand-sub">Finanzas con confianza</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- ENCABEZADO -->
-    <div class="page-head">
+<div class="page-wrap">
 
-        <h2 style="font-family: 'Inter', sans-serif">
-            <span class="title-icon"><i class="bi bi-calendar-check"></i></span>
-            Control de Cuotas
-        </h2>
-
-        <a href="cartilla.php?id=<?= $prestamo['id'] ?>" class="btn-volver">
-            <i class="bi bi-arrow-left"></i>
-            Volver
-        </a>
-
+    <!-- ===== BREADCRUMB ===== -->
+    <div class="breadcrumb-row">
+        <a href="public/dashboard.php">Panel</a>
+        <span class="sep">/</span>
+        <a href="listado.php">Préstamos</a>
+        <span class="sep">/</span>
+        <a href="cartilla.php?id=<?= htmlspecialchars($prestamo['id']) ?>">Cartilla</a>
+        <span class="sep">/</span>
+        <span class="current">Cuotas</span>
     </div>
 
-    <!-- INFORMACIÓN DEL PRÉSTAMO -->
-    <div class="ce-card">
-
-        <div class="ce-card-header">
-            <i class="bi bi-person-badge"></i>
-            <h4 style="font-family: 'Inter', sans-serif">Información del Préstamo</h4>
+    <!-- ===== ENCABEZADO ===== -->
+    <div class="page-head">
+        <div>
+            <h1 class="page-title">Control de cuotas</h1>
+            <p class="page-desc">Plan de pagos, vencimientos y estado de cada cuota del préstamo.</p>
         </div>
 
-        <div class="ce-card-body">
+        <div class="head-actions">
+            <span class="client-id-tag">
+                <i class="bi bi-calendar-check"></i>
+                Préstamo #<?= htmlspecialchars($prestamo['id']) ?>
+            </span>
 
-            <div class="row">
+        </div>
+    </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="info-item">
-                        <span class="info-label">Cliente</span>
-                        <span class="info-value"><?= htmlspecialchars($prestamo['cliente_nombre']) ?></span>
-                    </div>
+    <!-- ===== INFORMACIÓN DEL PRÉSTAMO ===== -->
+    <div class="edit-card">
+
+        <div class="card-section-head">
+            <p class="card-section-title">
+                <span class="icon-box"><i class="bi bi-person-badge"></i></span>
+                Información del préstamo
+            </p>
+
+            <?php if ($prestamo['estado'] == "Pagado"): ?>
+                <span class="status-badge is-pagado">Pagado</span>
+            <?php elseif ($prestamo['estado'] == "Mora"): ?>
+                <span class="status-badge is-mora">Mora</span>
+            <?php else: ?>
+                <span class="status-badge is-activo">Activo</span>
+            <?php endif; ?>
+        </div>
+
+        <div class="card-body-custom">
+
+            <div class="info-grid">
+
+                <div class="info-item">
+                    <span class="info-label">Cliente</span>
+                    <span class="info-value"><?= htmlspecialchars($prestamo['cliente_nombre']) ?></span>
                 </div>
 
-                <div class="col-md-4 mb-3">
-                    <div class="info-item">
-                        <span class="info-label">Cédula</span>
-                        <span class="info-value"><?= htmlspecialchars($prestamo['cliente_cedula']) ?></span>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <div class="info-item">
-                        <span class="info-label">Estado</span>
-                        <span class="info-value">
-                            <?php
-                            if($prestamo['estado']=="Pagado"){
-                                echo '<span class="ce-badge success"><i class="bi bi-check-circle-fill"></i> Pagado</span>';
-                            }elseif($prestamo['estado']=="Mora"){
-                                echo '<span class="ce-badge danger"><i class="bi bi-exclamation-triangle-fill"></i> Mora</span>';
-                            }else{
-                                echo '<span class="ce-badge warning"><i class="bi bi-clock-fill"></i> Activo</span>';
-                            }
-                            ?>
-                        </span>
-                    </div>
+                <div class="info-item">
+                    <span class="info-label">Cédula</span>
+                    <span class="info-value"><?= htmlspecialchars($prestamo['cliente_cedula']) ?></span>
                 </div>
 
             </div>
 
-            <hr class="info-divider">
+            <hr class="divider">
 
-            <!-- RESUMEN FINANCIERO -->
+            <p class="field-group-title">Resumen financiero</p>
+
+            <!-- ===== RESUMEN FINANCIERO ===== -->
             <div class="money-grid">
 
                 <div class="money-box">
                     <span class="money-label">Monto</span>
-                    <span class="money-value">$<?= number_format($prestamo['monto'],0,",",".") ?></span>
+                    <span class="money-value">$<?= number_format($prestamo['monto'], 0, ",", ".") ?></span>
                 </div>
 
-                <div class="money-box success">
+                <div class="money-box is-success">
                     <span class="money-label">Abonado</span>
-                    <span class="money-value">$<?= number_format($prestamo['abonado'],0,",",".") ?></span>
+                    <span class="money-value">$<?= number_format($prestamo['abonado'], 0, ",", ".") ?></span>
                 </div>
 
-                <div class="money-box gold">
+                <div class="money-box is-gold">
                     <span class="money-label">Pendiente</span>
-                    <span class="money-value">$<?= number_format($prestamo['pendiente'],0,",",".") ?></span>
+                    <span class="money-value">$<?= number_format($prestamo['pendiente'], 0, ",", ".") ?></span>
                 </div>
 
-                <div class="money-box danger">
+                <div class="money-box is-danger">
                     <span class="money-label">Mora</span>
-                    <span class="money-value">$<?= number_format($prestamo['mora'],0,",",".") ?></span>
+                    <span class="money-value">$<?= number_format($prestamo['mora'], 0, ",", ".") ?></span>
                 </div>
 
             </div>
@@ -156,35 +173,36 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     </div>
 
-    <!-- HISTORIAL DE CUOTAS -->
-    <div class="ce-card">
+    <!-- ===== HISTORIAL DE CUOTAS ===== -->
+    <div class="edit-card">
 
-        <div class="ce-card-header gold">
-            <i class="bi bi-list-check"></i>
-            <h5 style="font-family: 'Inter', sans-serif">Historial de Cuotas</h5>
+        <div class="card-section-head">
+            <p class="card-section-title">
+                <span class="icon-box"><i class="bi bi-list-check"></i></span>
+                Historial de cuotas
+            </p>
         </div>
 
-        <div class="ce-card-body">
+        <div class="table-wrap">
 
-            <div class="table-responsive">
+            <table class="table-custom">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha vencimiento</th>
+                        <th>Valor</th>
+                        <th>Estado</th>
+                        <th>Días atraso</th>
+                        <th>Mora</th>
+                        <th>Fecha pago</th>
+                    </tr>
+                </thead>
 
-                <table>
+                <tbody>
 
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Fecha Vencimiento</th>
-                            <th>Valor</th>
-                            <th>Estado</th>
-                            <th>Días Atraso</th>
-                            <th>Mora</th>
-                            <th>Fecha Pago</th>
-                        </tr>
-                    </thead>
+                <?php if (!empty($cuotas)): ?>
 
-                    <tbody>
-
-                    <?php foreach($cuotas as $c): ?>
+                    <?php foreach ($cuotas as $c): ?>
 
                         <tr class="<?= (!$c['pagada'] && $c['dias_atraso'] > 0) ? 'row-mora' : '' ?>">
 
@@ -192,46 +210,57 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             <td><?= $c['fecha_vencimiento']; ?></td>
 
-                            <td class="valor-cell">$<?= number_format($c['valor'],0,",","."); ?></td>
+                            <td class="cell-money">$<?= number_format($c['valor'], 0, ",", "."); ?></td>
 
                             <td>
-                                <?php
-                                if($c['pagada']){
-                                    echo '<span class="ce-badge success"><i class="bi bi-check-circle-fill"></i> Pagada</span>';
-                                }else{
-                                    echo '<span class="ce-badge warning"><i class="bi bi-clock-fill"></i> Pendiente</span>';
-                                }
-                                ?>
+                                <?php if ($c['pagada']): ?>
+                                    <span class="status-badge is-pagado">Pagada</span>
+                                <?php else: ?>
+                                    <span class="status-badge is-activo">Pendiente</span>
+                                <?php endif; ?>
                             </td>
 
                             <td><?= $c['dias_atraso']; ?></td>
 
-                            <td class="<?= $c['mora'] > 0 ? 'mora-cell' : 'text-muted-cell' ?>">
-                                $<?= number_format($c['mora'],0,",","."); ?>
+                            <td class="<?= $c['mora'] > 0 ? 'cell-danger' : 'cell-muted' ?>">
+                                $<?= number_format($c['mora'], 0, ",", "."); ?>
                             </td>
 
-                            <td class="<?= $c['fecha_pago'] ? '' : 'text-muted-cell' ?>">
-                                <?php
-                                if($c['fecha_pago']){
-                                    echo $c['fecha_pago'];
-                                }else{
-                                    echo "&mdash;";
-                                }
-                                ?>
+                            <td class="<?= $c['fecha_pago'] ? '' : 'cell-muted' ?>">
+                                <?= $c['fecha_pago'] ? $c['fecha_pago'] : '&mdash;'; ?>
                             </td>
 
                         </tr>
 
                     <?php endforeach; ?>
 
-                    </tbody>
+                <?php else: ?>
 
-                </table>
+                    <tr>
+                        <td colspan="7" class="table-empty">No hay cuotas registradas para este préstamo.</td>
+                    </tr>
 
-            </div>
+                <?php endif; ?>
+
+                </tbody>
+            </table>
 
         </div>
 
+    </div>
+
+    <div class="footer-actions">
+        <a href="cartilla.php?id=<?= $prestamo['id'] ?>" class="btn-cancel">
+            <i class="bi bi-arrow-left"></i>
+            Volver
+        </a>
+
+        <?php if ($prestamo['estado'] !== 'Pagado'): ?>
+            <a href="registrar_pago.php?id=<?= $prestamo['id'] ?>" class="btn-save">
+                <i class="bi bi-cash-coin"></i>
+                Registrar pago
+            </a>
+        <?php endif; ?>
     </div>
 
 </div>

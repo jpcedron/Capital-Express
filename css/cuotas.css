@@ -1,366 +1,161 @@
-/* ============================================================
-   Capital Express — Control de Cuotas
-   Diseño profesional fintech (Navy + Dorado)
-   Compatible con Bootstrap 5.3 + Bootstrap Icons
-   ============================================================ */
 
-:root {
-  --ce-navy: #1e2a3a;
-  --ce-navy-deep: #0d1f3c;
-  --ce-blue: #1a3560;
-  --ce-gold: #e8c876;
-  --ce-gold-dark: #c9a84c;
-  --ce-bg: #f4f6fb;
-
-  --ce-white: #ffffff;
-  --ce-text: #1e2a3a;
-  --ce-muted: #6b7789;
-  --ce-border: #e6eaf2;
-  --ce-shadow: 0 1px 2px rgba(13, 31, 60, 0.04), 0 8px 24px rgba(13, 31, 60, 0.06);
-  --ce-shadow-hover: 0 8px 30px rgba(13, 31, 60, 0.14);
-
-  --ce-success: #1f9d6b;
-  --ce-danger: #d64545;
-  --ce-warning: #d99a2b;
-
-  --ce-radius: 16px;
-  --ce-radius-sm: 12px;
+/* Acciones del encabezado alineadas junto al tag del préstamo */
+.head-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-body.cuotas-page {
-  margin: 0;
-  background-color: var(--ce-bg);
-  color: var(--ce-text);
-  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
+
+/* ===== Acciones al pie (alineadas a la izquierda) ===== */
+.footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 22px;
 }
 
-.cuotas-page h1,
-.cuotas-page h2,
-.cuotas-page h3,
-.cuotas-page h4,
-.cuotas-page h5,
-.cuotas-page h6 {
-  font-family: "Playfair Display", Georgia, serif;
-  color: var(--ce-navy);
-  letter-spacing: -0.01em;
+/* ===== Resumen financiero (grid de montos) ===== */
+.money-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
 }
 
-/* ============================================================
-   ENCABEZADO DE PÁGINA
-   ============================================================ */
-.cuotas-page .page-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 28px;
+.money-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: #fafbfd;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+    border-left: 3px solid var(--navy-mid);
 }
 
-.cuotas-page .page-head h2 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0;
-  font-size: 1.9rem;
-  font-weight: 700;
+.money-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
 }
 
-.cuotas-page .page-head h2 .title-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--ce-gold), var(--ce-gold-dark));
-  color: var(--ce-navy-deep);
-  font-size: 1.4rem;
-  box-shadow: 0 6px 16px rgba(201, 168, 76, 0.35);
+.money-value {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    color: var(--navy-deep);
+    line-height: 1.1;
 }
 
-/* Botón volver */
-.cuotas-page .btn-volver {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border: 1px solid var(--ce-border);
-  background: var(--ce-white);
-  color: var(--ce-navy);
-  font-weight: 600;
-  border-radius: var(--ce-radius-sm);
-  text-decoration: none;
-  transition: all 0.2s ease;
+.money-box.is-success {
+    border-left-color: #1f7a4d;
 }
 
-.cuotas-page .btn-volver:hover {
-  background: var(--ce-navy);
-  color: var(--ce-white);
-  border-color: var(--ce-navy);
-  transform: translateY(-1px);
+.money-box.is-success .money-value {
+    color: #1f7a4d;
 }
 
-/* ============================================================
-   TARJETAS
-   ============================================================ */
-.cuotas-page .ce-card {
-  background: var(--ce-white);
-  border: 1px solid var(--ce-border);
-  border-radius: var(--ce-radius);
-  box-shadow: var(--ce-shadow);
-  overflow: hidden;
-  margin-bottom: 28px;
+.money-box.is-gold {
+    border-left-color: var(--gold-dark);
+    background: linear-gradient(135deg, rgba(201, 168, 76, 0.1), rgba(232, 200, 118, 0.05));
 }
 
-.cuotas-page .ce-card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 24px;
-  background: linear-gradient(135deg, var(--ce-blue), var(--ce-navy-deep));
-  color: var(--ce-white);
+.money-box.is-gold .money-value {
+    color: #93761f;
 }
 
-.cuotas-page .ce-card-header h4,
-.cuotas-page .ce-card-header h5 {
-  margin: 0;
-  color: var(--ce-white);
-  font-size: 1.15rem;
-  font-weight: 700;
+.money-box.is-danger {
+    border-left-color: #a13636;
 }
 
-.cuotas-page .ce-card-header i {
-  color: var(--ce-gold);
-  font-size: 1.25rem;
+.money-box.is-danger .money-value {
+    color: #a13636;
 }
 
-/* Variante dorada para el historial */
-.cuotas-page .ce-card-header.gold {
-  background: linear-gradient(135deg, var(--ce-gold), var(--ce-gold-dark));
-}
-
-.cuotas-page .ce-card-header.gold h4,
-.cuotas-page .ce-card-header.gold h5,
-.cuotas-page .ce-card-header.gold i {
-  color: var(--ce-navy-deep);
-}
-
-.cuotas-page .ce-card-body {
-  padding: 24px;
-}
-
-/* ============================================================
-   DATOS DEL CLIENTE
-   ============================================================ */
-.cuotas-page .info-item {
-  margin-bottom: 4px;
-}
-
-.cuotas-page .info-label {
-  display: block;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ce-muted);
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.cuotas-page .info-value {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--ce-navy);
-}
-
-.cuotas-page .info-divider {
-  border: none;
-  border-top: 1px solid var(--ce-border);
-  margin: 22px 0;
-}
-
-/* ============================================================
-   RESUMEN FINANCIERO (mini stats)
-   ============================================================ */
-.cuotas-page .money-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.cuotas-page .money-box {
-  padding: 18px;
-  border-radius: var(--ce-radius-sm);
-  background: var(--ce-bg);
-  border: 1px solid var(--ce-border);
-  border-left: 4px solid var(--ce-blue);
-}
-
-.cuotas-page .money-box.gold {
-  border-left-color: var(--ce-gold-dark);
-}
-.cuotas-page .money-box.success {
-  border-left-color: var(--ce-success);
-}
-.cuotas-page .money-box.danger {
-  border-left-color: var(--ce-danger);
-}
-
-.cuotas-page .money-label {
-  display: block;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ce-muted);
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.cuotas-page .money-value {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--ce-navy);
-  line-height: 1.1;
-}
-
-.cuotas-page .money-box.danger .money-value {
-  color: var(--ce-danger);
-}
-
-/* ============================================================
-   BADGES DE ESTADO
-   ============================================================ */
-.cuotas-page .ce-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.cuotas-page .ce-badge.success {
-  background: rgba(31, 157, 107, 0.12);
-  color: var(--ce-success);
-}
-.cuotas-page .ce-badge.danger {
-  background: rgba(214, 69, 69, 0.12);
-  color: var(--ce-danger);
-}
-.cuotas-page .ce-badge.warning {
-  background: rgba(217, 154, 43, 0.14);
-  color: var(--ce-warning);
-}
-
-/* ============================================================
-   TABLA DE CUOTAS
-   ============================================================ */
-.cuotas-page .table-responsive {
-  border-radius: var(--ce-radius-sm);
-  overflow: hidden;
-  border: 1px solid var(--ce-border);
-}
-
-.cuotas-page table {
-  width: 100%;
-  margin: 0;
-  border-collapse: collapse;
-  font-size: 0.92rem;
-}
-
-.cuotas-page table thead th {
-  background: var(--ce-navy);
-  color: var(--ce-white);
-  font-weight: 600;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 14px 16px;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.cuotas-page table tbody td {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--ce-border);
-  color: var(--ce-text);
-  vertical-align: middle;
-}
-
-.cuotas-page table tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.cuotas-page table tbody tr {
-  transition: background 0.15s ease;
-}
-
-.cuotas-page table tbody tr:hover {
-  background: var(--ce-bg);
-}
-
-.cuotas-page table tbody tr.row-mora {
-  background: rgba(214, 69, 69, 0.04);
-}
-
-.cuotas-page .cuota-num {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: var(--ce-blue);
-  color: var(--ce-white);
-  font-weight: 700;
-  font-size: 0.82rem;
-}
-
-.cuotas-page .valor-cell {
-  font-weight: 700;
-  color: var(--ce-navy);
-}
-
-.cuotas-page .mora-cell {
-  font-weight: 700;
-  color: var(--ce-danger);
-}
-
-.cuotas-page .text-muted-cell {
-  color: var(--ce-muted);
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-@media (max-width: 767.98px) {
-  .cuotas-page .money-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 575.98px) {
-  .cuotas-page .page-head h2 {
-    font-size: 1.4rem;
-  }
-  .cuotas-page .page-head h2 .title-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.15rem;
-  }
-  .cuotas-page .money-grid {
-    grid-template-columns: 1fr;
-  }
-  .cuotas-page .ce-card-body {
-    padding: 18px;
-  }
-  .cuotas-page .btn-volver {
-    width: 100%;
+/* ===== Estados dentro de la tabla de cuotas ===== */
+.cuota-num {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-  }
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(30, 42, 58, 0.06);
+    color: var(--navy-deep);
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: 0.78rem;
+}
+
+.cell-money {
+    font-family: 'Sora', sans-serif;
+    font-weight: 600;
+    color: var(--navy-deep);
+}
+
+.cell-danger {
+    color: #a13636;
+    font-weight: 600;
+}
+
+.cell-muted {
+    color: var(--text-muted);
+}
+
+/* Fila de cuota en mora: sutil resalte a la izquierda */
+.table-custom tbody tr.row-mora {
+    background: rgba(180, 60, 60, 0.04);
+    box-shadow: inset 3px 0 0 #a13636;
+}
+
+.table-custom tbody tr.row-mora:hover {
+    background: rgba(180, 60, 60, 0.07);
+}
+
+/* Badges de estado inline dentro de la tabla (compactos) */
+.table-custom .status-badge {
+    white-space: nowrap;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .money-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .head-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .money-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .money-value {
+        font-size: 1.2rem;
+    }
+
+    .head-actions .btn-save,
+    .head-actions .btn-cancel {
+        flex: 1;
+        justify-content: center;
+    }
+      /* Botones del pie apilados uno debajo del otro, a todo el ancho */
+    .footer-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .footer-actions .btn-save,
+    .footer-actions .btn-cancel {
+        width: 100%;
+        justify-content: center;
+    }
 }

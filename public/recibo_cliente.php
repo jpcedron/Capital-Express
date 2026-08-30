@@ -50,178 +50,129 @@ $ultimaCuota = $stmt->fetch(PDO::FETCH_ASSOC);
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Recibo Capital Express</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante · Capital Express</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" >
-    <link rel="stylesheet" href="../css/panel_de_usuario.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/recibo_cliente.css">
 </head>
+<body class="ce-body">
 
-<body class="bg-light">
+<!-- ===== NAVBAR ===== -->
+<nav class="ce-navbar">
+    <div class="ce-navbar__inner">
+        <a href="panel_de_usuario.php" class="ce-navbar__brand">
+            <div class="brand-icon brand-heading">CE</div>
+            <div class="brand-text">
+                <div class="name">Capital Express</div>
+                <div class="tagline">Gestión de Préstamos</div>
+            </div>
+        </a>
 
-    <div class="container mt-5 mb-5 d-flex flex-column align-items-center">
+        <a href="panel_de_usuario.php" class="ce-navbar__back">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Panel</span>
+        </a>
+    </div>
+</nav>
 
-        <div class="card shadow w-100" style="max-width: 500px;">
+<div class="container ce-container ce-container--narrow">
 
-            <div class="card-header text-white text-center py-3" style="background: linear-gradient(135deg, #1a3560, #0d1b3a);">
-                <h2 class="mb-0 fs-3">
-                    CAPITAL EXPRESS
-                </h2>
+    <div class="ce-card ce-receipt">
 
-                <p class="mb-0 small">
-                    COMPROBANTE DE PRÉSTAMO
-                </p>
+        <!-- Encabezado del recibo -->
+        <div class="ce-header ce-header--center">
+            <div class="ce-receipt__mark"><i class="bi bi-receipt"></i></div>
+            <h1 class="ce-brand">CAPITAL EXPRESS</h1>
+            <p class="ce-header__subtitle">Comprobante de Préstamo</p>
+        </div>
 
+        <div class="ce-body-inner">
+
+            <!-- Cliente destacado -->
+            <div class="ce-client mb-3">
+                <div class="ce-client__avatar">
+                    <?= strtoupper(mb_substr($prestamo['nombre_cliente'], 0, 1)); ?>
+                </div>
+                <div class="ce-client__info">
+                    <span class="ce-client__name"><?= htmlspecialchars($prestamo['nombre_cliente']); ?></span>
+                    <span class="ce-client__meta">
+                        <i class="bi bi-hash"></i> Préstamo #<?= $prestamo['id']; ?>
+                    </span>
+                </div>
             </div>
 
-            <div class="card-body">
-
-                <div class="mb-3">
-
-                    <p class="mb-1">
-                        <strong>Cliente:</strong>
-                        <?= htmlspecialchars($prestamo['nombre_cliente']); ?>
-                    </p>
-
-                    <p class="mb-1">
-                        <strong>Monto:</strong>
-                        $<?= number_format(
-                            $prestamo['monto'],
-                            0,
-                            ',',
-                            '.'
-                        ); ?>
-                    </p>
-
-                    <p class="mb-1">
-                        <strong>Interés:</strong>
-                        <?= $prestamo['interes']; ?>%
-                    </p>
-
-                    <p class="mb-1">
-                        <strong>Fecha préstamo:</strong>
-                        <?= date(
-                            "d/m/Y",
-                            strtotime($prestamo['fecha_prestamo'])
-                        ); ?>
-                    </p>
-
-                    <p class="mb-1">
-
-                        <strong>Última cuota:</strong>
-
+            <!-- Detalle en filas -->
+            <div class="ce-rows">
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-cash-stack"></i> Monto</span>
+                    <span class="ce-row__value ce-money">$<?= number_format($prestamo['monto'], 0, ',', '.'); ?></span>
+                </div>
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-percent"></i> Interés</span>
+                    <span class="ce-row__value"><?= $prestamo['interes']; ?>%</span>
+                </div>
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-calendar-event"></i> Fecha préstamo</span>
+                    <span class="ce-row__value"><?= date("d/m/Y", strtotime($prestamo['fecha_prestamo'])); ?></span>
+                </div>
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-calendar-check"></i> Última cuota</span>
+                    <span class="ce-row__value">
                         <?= !empty($ultimaCuota['ultima_cuota'])
-
-                            ? date(
-                                "d/m/Y",
-                                strtotime($ultimaCuota['ultima_cuota'])
-                            )
-
-                            : "No registrada";
-                        ?>
-
-                    </p>
-
-                    <p class="mb-1">
-
-                        <strong>Mora:</strong>
-
-                        <span class="text-danger">
-
-                            $<?= number_format(
-                                $prestamo['mora'],
-                                0,
-                                ',',
-                                '.'
-                            ); ?>
-
-                        </span>
-
-                    </p>
-
-                    <p class="mb-1">
-
-                        <strong>Estado:</strong>
-
+                            ? date("d/m/Y", strtotime($ultimaCuota['ultima_cuota']))
+                            : '<span class="ce-dash">No registrada</span>'; ?>
+                    </span>
+                </div>
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-exclamation-triangle"></i> Mora</span>
+                    <span class="ce-row__value ce-money" style="color: var(--ce-bad);">
+                        $<?= number_format($prestamo['mora'], 0, ',', '.'); ?>
+                    </span>
+                </div>
+                <div class="ce-row">
+                    <span class="ce-row__label"><i class="bi bi-flag"></i> Estado</span>
+                    <span class="ce-row__value">
                         <?php if ($prestamo['estado'] == "Pagado"): ?>
-
-                            <span class="badge bg-success">
-                                Pagado
-                            </span>
-
+                            <span class="ce-pill is-paid"><i class="bi bi-check-circle-fill"></i> Pagado</span>
                         <?php elseif ($prestamo['estado'] == "Mora"): ?>
-
-                            <span class="badge bg-danger">
-                                Mora
-                            </span>
-
+                            <span class="ce-pill is-pending" style="background: var(--ce-bad-bg); color: var(--ce-bad);"><i class="bi bi-x-circle-fill"></i> Mora</span>
                         <?php else: ?>
-
-                            <span class="badge bg-warning text-dark">
-                                Activo
-                            </span>
-
+                            <span class="ce-pill is-pending"><i class="bi bi-dot"></i> Activo</span>
                         <?php endif; ?>
-
-                    </p>
-
-                    <hr class="my-2">
-
-                    <p class="mb-0">
-
-                        <strong>Total pagado:</strong>
-
-                        <span class="text-success fw-bold">
-
-                            $<?= number_format(
-                                $prestamo['abonado'],
-                                0,
-                                ',',
-                                '.'
-                            ); ?>
-
-                        </span>
-
-                    </p>
-
+                    </span>
                 </div>
+            </div>
 
-                <hr class="my-2">
+            <!-- Total pagado destacado -->
+            <div class="ce-total">
+                <span class="ce-total__label">Total pagado</span>
+                <span class="ce-total__value">$<?= number_format($prestamo['abonado'], 0, ',', '.'); ?></span>
+            </div>
 
-                <div class="d-grid gap-2 my-3">
+            <!-- Acciones -->
+            <div class="ce-actions ce-actions--stack">
+                <a href="descargar_recibo.php?id=<?= $prestamo['id']; ?>" class="btn-ce btn-ce--solid">
+                    <i class="bi bi-file-earmark-arrow-down-fill"></i>
+                    Descargar PDF
+                </a>
+                <a href="panel_de_usuario.php" class="btn-ce btn-ce--ghost">
+                    <i class="bi bi-arrow-left-circle"></i>
+                    Regresar al Panel
+                </a>
+            </div>
 
-                    <a href="descargar_recibo.php?id=<?= $prestamo['id']; ?>" class="btn-ce">
-                        <i class="bi bi-file-earmark-arrow-down-fill"></i>
-                        Descargar PDF
-                    </a>
-
-
-                    <a href="panel_de_usuario.php" class="btn-ce">
-                        <i class="bi bi-arrow-left-circle"></i>
-                        Regresar al Panel
-                    </a>
-
-                </div>
-
-                <hr class="my-2">
-
-                <div class="text-center text-muted small mt-2">
-
-                    <p class="mb-0">
-                        Documento informativo del préstamo.
-                    </p>
-
-                    <strong class="text-secondary">
-                        Capital Express
-                    </strong>
-
-                </div>
-
+            <!-- Pie -->
+            <div class="ce-receipt__footer">
+                <p class="mb-1">Documento informativo del préstamo.</p>
+                <strong>Capital Express</strong>
             </div>
 
         </div>
-
     </div>
 
-</body>
+</div>
 
+</body>
 </html>
