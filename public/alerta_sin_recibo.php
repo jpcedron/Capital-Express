@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Capital Express</title>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>

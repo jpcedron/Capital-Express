@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Capital Express</title>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -24,7 +23,7 @@ Swal.fire({
     allowOutsideClick: false
 }).then(() => {
 
-    window.location.href = "panel_de_usuario.php";
+    window.location.href = "public/panel_de_usuario.php";
 
 });
 

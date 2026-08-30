@@ -1,6 +1,7 @@
 <?php
 
 require_once "auth_cliente.php";
+require_once "../config/conexion.php";
 
 $nombreUsuario = $_SESSION["cliente_nombre"];
 $cedula = $_SESSION["cliente_cedula"];

@@ -1,7 +1,6 @@
 <?php
 
 require_once "config/conexion.php";
-
 $conexion = (new Conexion())->conectar();
 
 // Verificar ID
@@ -10,7 +9,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 
 $id = (int) $_GET['id'];
-
 
 
 // GUARDAR CAMBIOS
@@ -133,9 +131,9 @@ if (!$cliente) {
 <div class="page-wrap">
 
     <div class="breadcrumb-row">
-        <a href="pagina_web/dashboard.php">Panel</a>
+        <a href="public/dashboard.php">Panel</a>
         <span class="sep">/</span>
-        <a href="gestionar_clientes.php">Clientes</a>
+        <a href="public/gestionar_clientes.php">Clientes</a>
         <span class="sep">/</span>
         <span class="current">Editar cliente</span>
     </div>

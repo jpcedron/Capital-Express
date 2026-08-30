@@ -56,7 +56,7 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
     <div class="breadcrumb-row">
         <a href="public/dashboard.php">Panel</a>
         <span class="sep">/</span>
-        <a href="public/listado.php">Préstamos</a>
+        <a href="listado.php">Préstamos</a>
         <span class="sep">/</span>
         <span class="current">Registrar pago</span>
     </div>

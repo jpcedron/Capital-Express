@@ -1,3 +1,4 @@
+```php
 <?php
 
 require_once "vendor/autoload.php";
@@ -5,24 +6,17 @@ require_once "config/conexion.php";
 
 use Dompdf\Dompdf;
 
-$conexion = (new Conexion()) ->conectar();
+$conexion = (new Conexion())->conectar();
 
 $id = $_GET["id"] ?? 0;
 
 $sql = "
-
 SELECT
     p.*,
     c.nombre AS nombre_cliente,
     c.cedula,
     c.telefono,
-    c.direccion,
-
-    (
-        SELECT COALESCE(SUM(valor_pago), 0)
-        FROM pagos
-        WHERE prestamo_id = p.id
-    ) AS total_pagado
+    c.direccion
 
 FROM prestamos p
 
@@ -30,50 +24,51 @@ INNER JOIN clientes c
     ON p.cliente_id = c.id
 
 WHERE p.id = ?
-
 ";
 
-$stmt=
-$conexion->prepare($sql);
-
+$stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
 
-$prestamo=
-$stmt->fetch(PDO::FETCH_ASSOC);
+$prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if(!$prestamo){
-
-die("Préstamo no encontrado");
-
+if (!$prestamo) {
+    die("Préstamo no encontrado");
 }
 
+
 // Obtener la fecha de vencimiento de la última cuota
-$sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
-        FROM cuotas
-        WHERE prestamo_id = ?";
+$sql = "
+SELECT MAX(fecha_vencimiento) AS ultima_cuota
+FROM cuotas
+WHERE prestamo_id = ?
+";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
 
 $datosCuota = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$ultimaCuota = $datosCuota['ultima_cuota'] ?? null;
+$ultimaCuota = $datosCuota["ultima_cuota"] ?? null;
 
-$mora=
-$prestamo["mora"] ?? 0;
 
-$total=
-$prestamo["pendiente"]
-+
-$mora;
+// Mora
+$mora = $prestamo["mora"] ?? 0;
 
+
+// Estado del préstamo
 if ($prestamo["estado"] == "Pagado") {
+
     $estado = "PAGADO";
+
 } elseif ($prestamo["estado"] == "Mora") {
+
     $estado = "EN MORA";
+
 } else {
+
     $estado = "ACTIVO";
 }
+
 
 ob_start();
 
@@ -85,42 +80,28 @@ ob_start();
 
 <style>
 
-body{
-
-font-family:Arial;
-
-padding:30px;
-
+body {
+    font-family: Arial;
+    padding: 30px;
 }
 
-.card{
-
-border:1px solid #ddd;
-
-padding:30px;
-
+.card {
+    border: 1px solid #ddd;
+    padding: 30px;
 }
 
-h1{
-
-color:#ff6b35;
-
+h1 {
+    color: #ff6b35;
 }
 
-.linea{
-
-margin:12px 0;
-
+.linea {
+    margin: 12px 0;
 }
 
-.total{
-
-font-size:22px;
-
-font-weight:bold;
-
-color:red;
-
+.total {
+    font-size: 22px;
+    font-weight: bold;
+    color: red;
 }
 
 </style>
@@ -129,86 +110,59 @@ color:red;
 
 <body>
 
-<div class="card">
+    <div class="card">
 
-<h1>
+        <h1>Capital Express</h1>
 
-Capital Express
+        <hr>
 
-</h1>
+        <h2>Comprobante de Préstamo</h2>
 
-<hr>
 
-<h2>
+        <div class="linea">
+            Cliente:<?= htmlspecialchars($prestamo["nombre_cliente"]) ?>
+        </div>
 
-Comprobante de Préstamo
 
-</h2>
+        <div class="linea">
+            Cédula:<?= htmlspecialchars($prestamo["cedula"]) ?>
+        </div>
 
-<div class="linea">
 
-Cliente:
+    <div class="linea">
+        Monto:$<?= number_format( $prestamo["monto"],0,",","." ) ?>
+    </div>
 
-<?= htmlspecialchars($prestamo["nombre_cliente"]) ?>
 
-</div>
+    <div class="linea">
+        Fecha préstamo:<?= date( "d/m/Y", strtotime($prestamo["fecha_prestamo"]) ) ?>
+    </div>
 
-<div class="linea">
 
-Cédula:
+    <div class="linea">
+        Última cuota:<?= $ultimaCuota ? date("d/m/Y", strtotime($ultimaCuota)) : "No registrada"; ?>
+    </div>
 
-<?= htmlspecialchars($prestamo["cedula"]) ?>
 
-</div>
+    <div class="linea"> 
+        Mora:$<?= number_format( $prestamo["mora"],0,",","." ) ?>
+    </div>
 
-<div class="linea">
 
-Monto:
+    <div class="linea">
+        Estado:<?= $estado ?>
+    </div>
 
-$<?= number_format(
-$prestamo["monto"],
-0,
-",",
-"."
-) ?>
 
-</div>
+    <div class="linea">
+        Total pagado: $<?= number_format( $prestamo["abonado"],0,",","." ) ?>
+    </div>
 
-<div class="linea">
-Fecha préstamo:
-<?= date("d/m/Y", strtotime($prestamo["fecha_prestamo"])) ?>
-</div>
-
-<div class="linea">
-Última cuota:
-<?= $ultimaCuota
-    ? date("d/m/Y", strtotime($ultimaCuota))
-    : "No registrada"; ?>
-</div>
-
-<div class="linea">
-Mora:
-$<?= number_format($prestamo["mora"],0,",",".") ?>
-</div>
-
-<div class="linea">
-Estado:
-<?= $estado ?>
-</div>
-
-<div class="linea">
-    Total pagado:
-    $<?= number_format($prestamo["abonado"],0,",",".") ?>
-
-</div>
 
 <hr>
 
-Generado:
+Generado:<?= date("d/m/Y H:i") ?>
 
-<?= date(
-"d/m/Y H:i"
-) ?>
 
 </div>
 
@@ -218,27 +172,26 @@ Generado:
 
 <?php
 
-$html=
-ob_get_clean();
+$html = ob_get_clean();
 
-$pdf=
-new Dompdf();
+$pdf = new Dompdf();
 
 $pdf->loadHtml($html);
 
 $pdf->setPaper(
-"A4",
-"portrait"
+    "A4",
+    "portrait"
 );
 
 $pdf->render();
 
 $pdf->stream(
 
-"cartilla.pdf",
+    "recibo.pdf",
 
-[
-"Attachment"=>false
-]
+    [
+        "Attachment" => false
+    ]
 
 );
+```

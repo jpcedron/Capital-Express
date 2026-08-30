@@ -67,90 +67,57 @@ background:linear-gradient(
 );
 
 color:white;
-
 padding:25px;
-
 text-align:center;
-
 border-radius:10px;
 }
 
 .card{
-
 margin-top:20px;
-
 padding:20px;
-
 background:#f7f7f7;
-
 border-radius:12px;
-
 border-left:8px solid #ff6b35;
-
 }
 
 .info{
-
 width:100%;
-
 border-collapse:collapse;
-
 }
 
 .info td{
-
 padding:12px;
-
 border-bottom:1px solid #ddd;
 
 }
 
 .titulo{
-
 color:#ff6b35;
-
 font-weight:bold;
-
 }
 
 .tabla{
-
 width:100%;
-
 margin-top:25px;
-
 border-collapse:collapse;
-
 }
 
 .tabla th{
-
 background:#2c3e50;
-
 color:white;
-
 padding:12px;
-
 }
 
 .tabla td{
-
 padding:10px;
-
 text-align:center;
-
 border:1px solid #ddd;
-
 }
 
 .footer{
-
 margin-top:40px;
-
 text-align:center;
-
 color:#888;
-
 }
 
 </style>

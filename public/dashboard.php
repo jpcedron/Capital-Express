@@ -1,10 +1,9 @@
 <?php
 
-session_start();
-
+require_once "auth_admin.php";
 require_once "../config/conexion.php";
-$conexion = (new Conexion())->conectar();
 
+$conexion = (new Conexion())->conectar();
 
 /* INDICADORES GENERALES */
 
@@ -231,7 +230,7 @@ if($hora < 12){
             Capital Express
         </h3>
 
-        <a href="#" class="active">
+        <a href="dashboard.php" class="active">
             <i class="fa-solid fa-chart-line"></i>
             Dashboard
         </a>
@@ -266,10 +265,11 @@ if($hora < 12){
             Configuración
         </a>
 
-        <a href="#">
+        <a href="cerrar_sesion_admin.php">
             <i class="fa-solid fa-right-from-bracket"></i>
             Cerrar sesión
         </a>
+
 
     </div>
 
