@@ -204,6 +204,10 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
                 <div class="tagline">Gestión de Préstamos</div>
             </div>
         </a>
+        <a href="panel_de_usuario.php" class="ce-navbar__back">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Inicio</span>
+        </a>
     </div>
 </nav>
 

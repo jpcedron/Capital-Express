@@ -72,7 +72,7 @@ $ultimaCuota = $stmt->fetch(PDO::FETCH_ASSOC);
 
         <a href="panel_de_usuario.php" class="ce-navbar__back">
             <i class="bi bi-grid-1x2"></i>
-            <span>Panel</span>
+            <span>Inicio</span>
         </a>
     </div>
 </nav>

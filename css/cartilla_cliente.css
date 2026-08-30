@@ -410,15 +410,18 @@
     color: #c3cad8;
 }
 
-/* ---------- Acciones ---------- */
+/* ---------- Acciones distribuídas a ambos extremos ---------- */
+/* ---------- Acciones juntas (uno al lado del otro) ---------- */
 .ce-actions {
     display: flex;
-    gap: .85rem;
-    flex-wrap: wrap;
+    justify-content: flex-start; /* O usa 'center' para alinearlos al centro, o 'flex-end' a la derecha */
+    align-items: center;
+    gap: .75rem; /* Separación pequeña entre botones */
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--ce-line);
 }
+
 .btn-ce {
     display: inline-flex;
     align-items: center;
@@ -432,19 +435,34 @@
     cursor: pointer;
     border: 1px solid transparent;
 }
-.btn-ce:hover { transform: translateY(-1px); }
+
+.btn-ce:hover { 
+    transform: translateY(-1px); 
+}
+
 .btn-ce--solid {
     background: linear-gradient(135deg, var(--ce-navy-700), var(--ce-navy-900));
     color: #fff;
-    box-shadow: 0 10px 24px -12px rgba(13,27,58,.6);
+    box-shadow: 0 6px 16px rgba(201,168,76,0.35);
 }
-.btn-ce--solid:hover { color: #fff; box-shadow: 0 14px 28px -12px rgba(13,27,58,.75); }
+
+.btn-ce--solid:hover {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+    color: var(--navy-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(201,168,76,0.35);
+}
+
 .btn-ce--ghost {
     background: #fff;
     color: var(--ce-navy-700);
     border-color: var(--ce-line);
 }
-.btn-ce--ghost:hover { background: #f4f6fb; color: var(--ce-navy-900); }
+
+.btn-ce--ghost:hover { 
+    background: #f4f6fb; 
+    color: var(--ce-navy-900); 
+}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
@@ -481,8 +499,12 @@
 }
 
 @media (max-width: 480px) {
-    .ce-stats { grid-template-columns: 1fr; }
-    .ce-actions .btn-ce { flex: 1; justify-content: center; }
-    .ce-navbar__back span { display: none; }
-    .ce-navbar__inner { padding: .7rem 1rem; }
+    .ce-actions {
+        flex-direction: column; /* En pantallas muy pequeñas se apilan verticalmente para mejor usabilidad */
+        gap: .5rem;
+    }
+    .ce-actions .btn-ce { 
+        width: 100%; 
+        justify-content: center; 
+    }
 }

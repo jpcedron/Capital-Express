@@ -2,7 +2,6 @@
 
 session_start();
 
-
 // Verificar que exista una sesión administrativa
 if (!isset($_SESSION["admin_id"])) {
 
