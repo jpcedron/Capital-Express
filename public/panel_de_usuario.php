@@ -173,12 +173,10 @@ $cedula = $_SESSION["cliente_cedula"];
   </div><!-- /container -->
 </section>
 
-
 <!--FOOTER -->
 <footer class="footer-ce">
   &copy; <?= date('Y') ?> <span>Capital Express</span> &mdash; Todos los derechos reservados.
 </footer>
-
 
 <!-- Bootstrap 5 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
