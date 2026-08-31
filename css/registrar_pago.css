@@ -25,6 +25,7 @@ html, body {
 .topbar {
     background: var(--navy-deep);
     border-bottom: 3px solid var(--gold-dark);
+
 }
 
 .topbar-inner {

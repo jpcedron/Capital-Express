@@ -185,7 +185,6 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
 
 <div class="topbar">
     <div class="topbar-inner">
-
         <div class="brand-row">
             <div class="brand-mark brand-heading">CE</div>
             <div>
@@ -193,7 +192,6 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
                 <p class="brand-sub">Finanzas con confianza</p>
             </div>
         </div>
-
     </div>
 </div>
 

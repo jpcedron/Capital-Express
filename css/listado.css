@@ -23,7 +23,7 @@ body {
     border-bottom: 3px solid var(--gold);
 }
 .top-bar .brand {
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Playfair Display', serif;
     font-weight: 800;
     font-size: 1.3rem;
     color: var(--gold-light);

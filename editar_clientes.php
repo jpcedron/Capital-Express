@@ -133,7 +133,7 @@ if (!$cliente) {
     <div class="breadcrumb-row">
         <a href="public/dashboard.php">Panel</a>
         <span class="sep">/</span>
-        <a href="public/gestionar_clientes.php">Clientes</a>
+        <a href="gestionar_clientes.php">Clientes</a>
         <span class="sep">/</span>
         <span class="current">Editar cliente</span>
     </div>
