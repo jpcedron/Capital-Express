@@ -47,7 +47,7 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
       <span class="ce-mark" style="font-family: 'Playfair Display', serif;">CE</span>
       <div>
         <div class="ce-name" style="font-family: 'Playfair Display', serif;">Capital Express</div>
-        <div class="ce-tag">Gestión de préstamos</div>
+        <div class="ce-tag">Finanzas con Confianza</div>
       </div>
     </div>
     <nav class="d-none d-md-flex align-items-center gap-1">

@@ -29,7 +29,7 @@ require_once "config/conexion.php";
       <span class="ce-brand-mark" style="font-family: 'Playfair Display', serif;">CE</span>
     <div>
     <div class="ce-brand-name" style="font-family: 'Playfair Display', serif;">Capital Express</div>
-        <div class="ce-brand-tag">Gestión de préstamos</div>
+        <div class="ce-brand-tag">Finanzas con Confianza</div>
       </div>
     </div>
     <nav class="d-none d-md-flex align-items-center gap-1">

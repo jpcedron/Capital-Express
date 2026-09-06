@@ -48,7 +48,7 @@ body {
 .ce-topbar .ce-name {
   font-family: var(--ce-font-heading);
   font-weight: 600;
-  color: var(--ce-white);
+  color: var(--ce-gold);
   font-size: 1.40rem;
   letter-spacing: 0.2px;
 }

@@ -28,7 +28,7 @@ $clienteInactivo = isset($_GET['error']) && $_GET['error'] === 'cliente_inactivo
 
 <!-- TOP BAR -->
 <nav class="top-bar">
-  <div class="container-fluid px-4">
+  <div class="container-fluid px-5">
     <div class="d-flex align-items-center gap-3">
       <div class="brand-icon"><i class="bi bi-bank2"></i></div>
       <div>

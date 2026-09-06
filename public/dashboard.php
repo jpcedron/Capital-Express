@@ -235,22 +235,22 @@ if($hora < 12){
             Dashboard
         </a>
 
-        <a href="#">
+        <a href="../gestionar_clientes.php">
             <i class="fa-solid fa-users"></i>
             Clientes
         </a>
 
-        <a href="#">
+        <a href="../nuevo_prestamo.php">
             <i class="fa-solid fa-money-bill-wave"></i>
-            Préstamos
+            Préstamo
         </a>
 
-        <a href="#">
+        <a href="../listado.php">
             <i class="fa-solid fa-wallet"></i>
             Pagos
         </a>
 
-        <a href="#">
+        <a href="../listado.php">
             <i class="fa-solid fa-calendar-days"></i>
             Cuotas
         </a>

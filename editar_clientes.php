@@ -121,7 +121,7 @@ if (!$cliente) {
             <div class="brand-mark brand-heading">CE</div>
             <div>
                 <p class="brand-name brand-heading">Capital Express</p>
-                <p class="brand-sub">Panel administrativo</p>
+                <p class="brand-sub">Finanzas con Confianza</p>
             </div>
         </div>
 

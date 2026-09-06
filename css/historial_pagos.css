@@ -59,7 +59,7 @@ body {
 .brand-title {
     font-family: 'Sora', sans-serif;
     font-weight: 600;
-    font-size: 1.25rem;
+    font-size: 1.40rem;
     color: #ffffff;
 }
 
@@ -68,9 +68,9 @@ font-family: 'Playfair Display', serif;
 }
 
 .brand-sub {
-    font-size: 0.70rem;
+    font-size: 0.68rem;
     color: #9fb0cc;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.06em;
 }
 
 .topbar-user {

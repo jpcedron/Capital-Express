@@ -52,7 +52,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="brand-mark brand-heading">CE</div>
             <div class="brand-text">
                 <div class="brand-title brand-heading">Capital Express</div>
-                <div class="brand-sub">PANEL ADMINISTRATIVO</div>
+                <div class="brand-sub">Finanzas con Confianza</div>
             </div>
         </div>
     </div>
