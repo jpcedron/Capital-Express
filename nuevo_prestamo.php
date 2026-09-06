@@ -1,3 +1,10 @@
+<?php
+
+require_once "public/auth_admin.php";
+require_once "config/conexion.php";
+
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

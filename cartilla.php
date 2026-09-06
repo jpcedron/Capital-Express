@@ -1,12 +1,16 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
-$conexion =
-(new Conexion())->conectar();
+$conexion = (new Conexion())->conectar();
 
-$id =
-$_GET['id'];
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+if (!$id) {
+    header("Location: public/dashboard.php");
+    exit;
+}
 
 $sql = "SELECT
             prestamos.*,

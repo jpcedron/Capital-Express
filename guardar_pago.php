@@ -1,13 +1,21 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$prestamo_id = $_POST['prestamo_id'];
-$valor_pago = floatval($_POST['valor_pago']);
+/* Validar y obtener los datos del formulario */
+$prestamo_id = filter_input(INPUT_POST, 'prestamo_id', FILTER_VALIDATE_INT);
+$valor_pago = filter_input(INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT);
 
-$sql = "SELECT * FROM prestamos WHERE id=?";
+if (!$prestamo_id || $valor_pago === false || $valor_pago <= 0) {
+    die("Datos de pago inválidos.");
+}
+
+$valor_pago_original = $valor_pago;
+
+$sql = "SELECT * FROM prestamos WHERE id = ?";
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$prestamo_id]);
 

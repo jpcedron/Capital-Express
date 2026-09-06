@@ -1,17 +1,18 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-if (!isset($_GET['id'])) {
+$prestamo_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+if (!$prestamo_id) {
     die("Préstamo no encontrado.");
 }
 
-$prestamo_id = $_GET['id'];
 
 /* Obtener información del préstamo */
-
 $sql = "SELECT
             prestamos.*,
             clientes.nombre AS cliente_nombre,

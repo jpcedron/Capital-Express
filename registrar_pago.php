@@ -1,10 +1,15 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$id = $_GET['id'];
+$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+if (!$id) {
+    die("Préstamo no encontrado.");
+}
 
 $sql = "SELECT
             prestamos.*,

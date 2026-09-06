@@ -1,10 +1,11 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-$prestamo_id = $_GET['prestamo_id'] ?? null;
+$prestamo_id = filter_input(INPUT_GET, 'prestamo_id', FILTER_VALIDATE_INT);
 
 if (!$prestamo_id) {
     die("Préstamo no encontrado");
@@ -12,10 +13,10 @@ if (!$prestamo_id) {
 
 $sql = "
 SELECT
-fecha_pago,
-valor_pago,
-saldo_restante,
-observacion
+    fecha_pago,
+    valor_pago,
+    saldo_restante,
+    observacion
 FROM pagos
 WHERE prestamo_id = ?
 ORDER BY fecha_pago DESC
