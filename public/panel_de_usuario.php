@@ -18,22 +18,21 @@ $cedula = $_SESSION["cliente_cedula"];
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <!-- Google Fondos -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <!-- En el navbar -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/panel_de_usuario.css"/>
-  <!-- En el navbar -->
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">  
+  
 </head>
 <body>
 
-<!--
-     NAVBAR
- -->
+<!-- NAVBAR -->
 <nav class="navbar-ce d-flex align-items-center justify-content-between">
 
   <!-- Logo + Nombre -->
   <a href="pagina_informativa.php" class="navbar-brand-ce">
     <div class="brand-icon brand-heading">CE</div>
     <div class="brand-text">
-      <div class="name ">Capital Express</div>
+      <div class="name brand-heading">Capital Express</div>
       <div class="tagline">Gestión de Préstamos</div>
     </div>
   </a>
