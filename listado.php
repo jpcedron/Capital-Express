@@ -41,12 +41,21 @@ $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- TOP BAR -->
 <nav class="top-bar">
   <div class="container-fluid px-5">
-    <div class="d-flex align-items-center gap-3">
-      <div class="brand-icon"><i class="bi bi-bank2"></i></div>
-      <div>
-        <div class="brand" style="font-family: 'Playfair Display', serif;">Capital Express</div>
-        <div class="tagline">Finanzas con Confianza</div>
+    <div class="d-flex align-items-center justify-content-between">
+      <!-- Logo y Nombre (Intactos) -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="brand-icon"><i class="bi bi-bank2"></i></div>
+        <div>
+          <div class="brand" style="font-family: 'Playfair Display', serif;">Capital Express</div>
+          <div class="tagline">Finanzas con Confianza</div>
+        </div>
       </div>
+      <nav class="d-none d-md-flex align-items-center gap-1">
+        <a href="public/dashboard.php" class="nav-link-custom">
+          <i class="bi bi-person-circle me-1"></i>Panel
+        </a>
+      </nav>
+
     </div>
   </div>
 </nav>

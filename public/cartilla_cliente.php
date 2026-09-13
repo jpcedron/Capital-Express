@@ -7,6 +7,10 @@ $conexion = (new Conexion())->conectar();
 
 $cedula = $_SESSION["cliente_cedula"];
 
+/* =========================================================
+   OBTENER PRÉSTAMO ACTIVO DEL CLIENTE
+   ========================================================= */
+
 $sql = "SELECT
             p.*,
             c.nombre AS cliente_nombre,
@@ -18,7 +22,7 @@ $sql = "SELECT
         INNER JOIN clientes c
             ON c.id = p.cliente_id
         WHERE c.cedula = ?
-        AND p.estado IN ('Activo','Mora')
+        AND p.estado IN ('Activo', 'Mora')
         ORDER BY p.id DESC
         LIMIT 1";
 
@@ -27,6 +31,11 @@ $stmt->execute([$cedula]);
 
 $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
+/* =========================================================
+   SI EL CLIENTE NO TIENE PRÉSTAMO ACTIVO
+   ========================================================= */
+
 if (!$prestamo) {
 
     require_once "alerta_sin_prestamo.php";
@@ -34,146 +43,32 @@ if (!$prestamo) {
 
 }
 
+
+/* =========================================================
+   ID DEL PRÉSTAMO
+   ========================================================= */
+
 $id = $prestamo["id"];
 
-$sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
-        FROM cuotas
-        WHERE prestamo_id = ?";
+
+/* =========================================================
+   HISTORIAL DE PAGOS
+   ========================================================= */
+
+$sql = "SELECT
+            fecha_pago,
+            valor_pago,
+            pago_mora,
+            pago_capital,
+            saldo_restante
+        FROM pagos
+        WHERE prestamo_id = ?
+        ORDER BY fecha_pago DESC";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$id]);
 
-$datosCuota = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$fechaLimite = null;
-
-if (!empty($datosCuota['ultima_cuota'])) {
-    $fechaLimite = new DateTime($datosCuota['ultima_cuota']);
-}
-
-$hoy = new DateTime();
-
-$sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
-        FROM cuotas
-        WHERE prestamo_id = ?";
-
-$stmt = $conexion->prepare($sql);
-$stmt->execute([$id]);
-
-$datosCuota = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$fechaLimite = null;
-
-if (!empty($datosCuota['ultima_cuota'])) {
-    $fechaLimite = new DateTime($datosCuota['ultima_cuota']);
-}
-
-$diasAtraso = 0;
-
-$mora = 0;
-
-$totalActual =
-$prestamo['pendiente'];
-
-/* porcentaje inicial */
-
-$porcentajeMora = 0;
-
-if (
-    $prestamo['pendiente'] > 0 &&
-    $fechaLimite !== null &&
-    $hoy > $fechaLimite
-) {
-
-$diasAtraso =
-$fechaLimite
-->diff(
-$hoy
-)
-->days;
-
-/* calcular porcentaje */
-
-if(
-$diasAtraso >= 3
-&&
-$diasAtraso <= 14
-){
-
-$porcentajeMora = 5;
-
-}
-elseif(
-$diasAtraso >= 15
-&&
-$diasAtraso <= 29
-){
-
-$porcentajeMora = 10;
-
-}
-elseif(
-$diasAtraso >= 30
-&&
-$diasAtraso <= 44
-){
-
-$porcentajeMora = 15;
-
-}
-elseif(
-$diasAtraso >= 45
-){
-
-$porcentajeMora = 20;
-
-}
-
-/* calcular mora */
-
-$mora =
-
-$prestamo['pendiente']
-
-*
-
-(
-
-$porcentajeMora
-
-/
-
-100
-
-);
-
-$totalActual =
-
-$prestamo['pendiente']
-
-+
-
-$mora;
-
-}
-
-/* HISTORIAL */
-
-$sql = "
-
-SELECT *
-
-FROM pagos
-
-WHERE prestamo_id=?
-
-ORDER BY fecha_pago DESC
-
-";
-
-$stmt =
-$conexion->prepare($sql); $stmt->execute([
-$id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
+$pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -303,74 +198,82 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
         </div>
     </div>
 
-    <!-- ===== DETALLE DE CUOTAS ===== -->
-    <div class="ce-card">
-        <div class="ce-card__head">
-            <p class="ce-card__title">
-                <span class="icon-box"><i class="bi bi-list-check"></i></span>
-                Detalle de cuotas
-            </p>
-        </div>
+<!-- ===== HISTORIAL DE PAGOS ===== -->
+<div class="ce-card">
 
-        <div class="ce-table-wrap">
-            <table class="ce-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Vencimiento</th>
-                        <th>Valor</th>
-                        <th>Estado</th>
-                        <th>Días atraso</th>
-                        <th>Mora</th>
-                        <th>Fecha pago</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                <?php if (!empty($cuotas)): ?>
-
-                    <?php foreach ($cuotas as $c): ?>
-
-                        <tr>
-                            <td data-label="#"><span class="ce-num"><?= $c['numero_cuota'] ?></span></td>
-                            <td data-label="Vencimiento"><?= $c['fecha_vencimiento'] ?></td>
-                            <td data-label="Valor" class="ce-money">$<?= number_format($c['valor']) ?></td>
-                            <td data-label="Estado">
-                                <?php if ($c['pagada']): ?>
-                                    <span class="ce-pill is-paid"><i class="bi bi-check-lg"></i> Pagada</span>
-                                <?php else: ?>
-                                    <span class="ce-pill is-pending"><i class="bi bi-clock"></i> Pendiente</span>
-                                <?php endif; ?>
-                            </td>
-                            <td data-label="Días atraso">
-                                <?php if (($c['dias_atraso'] ?? 0) > 0): ?>
-                                    <span class="ce-late-days"><?= $c['dias_atraso'] ?></span>
-                                <?php else: ?>
-                                    <span class="ce-dash">0</span>
-                                <?php endif; ?>
-                            </td>
-                            <td data-label="Mora" class="ce-money">$<?= number_format($c['mora'] ?? 0) ?></td>
-                            <td data-label="Fecha pago"><?= $c['fecha_pago'] ? $c['fecha_pago'] : '<span class="ce-dash">—</span>' ?></td>
-                        </tr>
-
-                    <?php endforeach; ?>
-
-                <?php else: ?>
-
-                    <tr>
-                        <td colspan="7" class="ce-empty">
-                            <i class="bi bi-inbox"></i>
-                            No hay cuotas registradas para este préstamo.
-                        </td>
-                    </tr>
-
-                <?php endif; ?>
-
-                </tbody>
-            </table>
-        </div>
+    <div class="ce-card__head">
+        <p class="ce-card__title">
+            <span class="icon-box">
+                <i class="bi bi-clock-history"></i>
+            </span>
+            Historial de pagos
+        </p>
     </div>
+
+    <div class="ce-table-wrap">
+
+        <table class="ce-table">
+
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Pago</th>
+                    <th>Mora</th>
+                    <th>Capital</th>
+                    <th>Saldo restante</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            <?php if (!empty($pagos)): ?>
+
+                <?php foreach ($pagos as $pago): ?>
+
+                    <tr>
+
+                        <td data-label="Fecha">
+                            <?= htmlspecialchars($pago['fecha_pago']) ?>
+                        </td>
+
+                        <td data-label="Pago" class="ce-money">
+                            $<?= number_format($pago['valor_pago']) ?>
+                        </td>
+
+                        <td data-label="Mora" class="ce-money">
+                            $<?= number_format($pago['pago_mora'] ?? 0) ?>
+                        </td>
+
+                        <td data-label="Capital" class="ce-money">
+                            $<?= number_format($pago['pago_capital'] ?? 0) ?>
+                        </td>
+
+                        <td data-label="Saldo restante" class="ce-money">
+                            $<?= number_format($pago['saldo_restante']) ?>
+                        </td>
+
+                    </tr>
+
+                <?php endforeach; ?>
+
+            <?php else: ?>
+
+                <tr>
+                    <td colspan="5" class="ce-empty">
+                        <i class="bi bi-inbox"></i>
+                        No hay pagos registrados para este préstamo.
+                    </td>
+                </tr>
+
+            <?php endif; ?>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
     <!-- ===== ACCIONES ===== -->
     <div class="ce-card">

@@ -5,17 +5,32 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
-/* Validar y obtener los datos del formulario */
-$prestamo_id = filter_input(INPUT_POST, 'prestamo_id', FILTER_VALIDATE_INT);
-$valor_pago = filter_input(INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT);
+/* =========================================================
+   VALIDAR DATOS DEL FORMULARIO
+========================================================= */
+
+$prestamo_id = filter_input( INPUT_POST, 'prestamo_id', FILTER_VALIDATE_INT );
+$valor_pago = filter_input( INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT );
 
 if (!$prestamo_id || $valor_pago === false || $valor_pago <= 0) {
     die("Datos de pago inválidos.");
 }
 
-$valor_pago_original = $valor_pago;
+/*
+ * Una única fecha para todo el registro del pago.
+ * Se utilizará tanto en pagos como en cuotas.
+ */
+$fechaPago = date('Y-m-d H:i:s');
 
-$sql = "SELECT * FROM prestamos WHERE id = ?";
+
+/* =========================================================
+   OBTENER PRÉSTAMO
+========================================================= */
+
+$sql = "SELECT *
+        FROM prestamos
+        WHERE id = ?";
+
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$prestamo_id]);
 
@@ -29,14 +44,19 @@ if ($prestamo['estado'] === 'Pagado') {
     die("Este préstamo ya fue pagado.");
 }
 
-/* Buscar la primera cuota pendiente */
+
+/* =========================================================
+   BUSCAR LA PRIMERA CUOTA PENDIENTE O EN MORA
+========================================================= */
+
 $sqlCuota = "
-SELECT *
-FROM cuotas
-WHERE prestamo_id = ?
-AND estado IN ('Pendiente','Mora')
-ORDER BY numero_cuota ASC
-LIMIT 1";
+    SELECT *
+    FROM cuotas
+    WHERE prestamo_id = ?
+    AND estado IN ('Pendiente','Mora')
+    ORDER BY numero_cuota ASC
+    LIMIT 1
+";
 
 $stmtCuota = $conexion->prepare($sqlCuota);
 $stmtCuota->execute([$prestamo_id]);
@@ -48,63 +68,84 @@ if (!$cuota) {
     exit;
 }
 
+
+/* =========================================================
+   DATOS INICIALES
+========================================================= */
+
 $pendiente = floatval($prestamo['pendiente']);
 $mora = floatval($prestamo['mora']);
 
 $hoy = new DateTime();
 
-/* Obtener la fecha de la última cuota */
+
+/* =========================================================
+   OBTENER FECHA DE LA ÚLTIMA CUOTA
+========================================================= */
 
 $sqlUltima = "
-SELECT MAX(fecha_vencimiento) AS ultima_fecha
-FROM cuotas
-WHERE prestamo_id = ?";
+    SELECT MAX(fecha_vencimiento) AS ultima_fecha
+    FROM cuotas
+    WHERE prestamo_id = ?
+";
 
 $stmtUltima = $conexion->prepare($sqlUltima);
 $stmtUltima->execute([$prestamo_id]);
 
 $ultimaCuota = $stmtUltima->fetch(PDO::FETCH_ASSOC);
 
-/* Verificar si el préstamo ya finalizó */
+
+/* =========================================================
+   VERIFICAR SI EL PRÉSTAMO YA FINALIZÓ
+========================================================= */
 
 $prestamoFinalizado = false;
 
 if (!empty($ultimaCuota['ultima_fecha'])) {
-
     $fechaFinal = new DateTime($ultimaCuota['ultima_fecha']);
-
     if ($hoy > $fechaFinal) {
-
         $diasFinal = $fechaFinal->diff($hoy)->days;
-
         if ($diasFinal >= 3) {
             $prestamoFinalizado = true;
         }
     }
 }
 
-/* Definir la base para calcular la mora */
+
+/* =========================================================
+   DEFINIR BASE PARA CALCULAR MORA
+========================================================= */
 
 if ($prestamoFinalizado) {
-
-    // El préstamo ya terminó: la mora va sobre el saldo pendiente.
+    // El préstamo ya terminó:
+    // la mora se calcula sobre el saldo pendiente.
     $baseMora = $pendiente;
-
 } else {
-
-    // El préstamo sigue vigente: la mora va sobre la cuota vencida.
+    // El préstamo sigue vigente:
+    // la mora se calcula sobre la cuota vencida.
     $baseMora = floatval($cuota['valor']);
 }
 
 
-$fecha_vencimiento = new DateTime($cuota['fecha_vencimiento']);
+/* =========================================================
+   CALCULAR DÍAS DE ATRASO
+========================================================= */
+
+$fecha_vencimiento = new DateTime( $cuota['fecha_vencimiento'] );
+
 $dias_atraso = 0;
 
 if ($hoy > $fecha_vencimiento) {
-    $dias_atraso = $fecha_vencimiento->diff($hoy)->days;
+    $dias_atraso = $fecha_vencimiento
+        ->diff($hoy)
+        ->days;
 }
 
-/* calcular mora */
+
+/* =========================================================
+   CALCULAR MORA
+========================================================= */
+
 if ($dias_atraso >= 3) {
     if ($dias_atraso <= 14) {
         $porcentaje = 5;
@@ -118,9 +159,9 @@ if ($dias_atraso >= 3) {
 
     $ultima_mora = $prestamo['ultima_mora'];
 
+
     if ($ultima_mora !== date('Y-m-d')) {
-        $semanas = max(1, ceil($dias_atraso - 2) / 7);
-        /*$semanas = ceil($dias_atraso / 7); */
+        $semanas = max( 1, ceil(($dias_atraso - 2) / 7) );
 
         $mora = round(
             $baseMora *
@@ -129,16 +170,19 @@ if ($dias_atraso >= 3) {
             2
         );
 
+
         $sql = "
-        UPDATE prestamos
-        SET
-        mora=?,
-        porcentaje_mora=?,
-        ultima_mora=?,
-        estado='Mora'
-        WHERE id=?";
+            UPDATE prestamos
+            SET
+                mora = ?,
+                porcentaje_mora = ?,
+                ultima_mora = ?,
+                estado = 'Mora'
+            WHERE id = ?
+        ";
 
         $stmt = $conexion->prepare($sql);
+
         $stmt->execute([
             $mora,
             $porcentaje,
@@ -148,16 +192,26 @@ if ($dias_atraso >= 3) {
     }
 }
 
+
+/* =========================================================
+   ACTUALIZAR ESTADO DE LA CUOTA ANTES DEL PAGO
+========================================================= */
+
+$estadoCuota = ($mora > 0)
+    ? "Mora"
+    : "Pendiente";
+
+
 $sql = "
-UPDATE cuotas
-SET
-dias_atraso = ?,
-mora = ?,
-estado = ?
-WHERE id = ?";
+    UPDATE cuotas
+    SET
+        dias_atraso = ?,
+        mora = ?,
+        estado = ?
+    WHERE id = ?
+";
 
 $stmt = $conexion->prepare($sql);
-$estadoCuota = ($mora > 0) ? "Mora" : "Pendiente";
 
 $stmt->execute([
     $dias_atraso,
@@ -166,38 +220,76 @@ $stmt->execute([
     $cuota['id']
 ]);
 
-/* pagar primero mora */
+
+/* =========================================================
+   PAGAR PRIMERO LA MORA
+========================================================= */
+
 $pago_mora = 0;
 $pago_capital = 0;
 
 if ($mora > 0) {
-    $pago_mora = min($valor_pago, $mora);
+    $pago_mora = min(
+        $valor_pago,
+        $mora
+    );
+
     $mora -= $pago_mora;
+
     $valor_pago -= $pago_mora;
 }
 
-/* luego capital */
+
+/* =========================================================
+   DESPUÉS PAGAR CAPITAL
+========================================================= */
+
 if ($valor_pago > 0) {
-    $pago_capital = min($valor_pago, $pendiente);
+
+    $pago_capital = min(
+        $valor_pago,
+        $pendiente
+    );
+
     $pendiente -= $pago_capital;
 }
 
-$nuevo_abonado = $prestamo['abonado'] + $pago_mora + $pago_capital;
+
+/* =========================================================
+   ACTUALIZAR ABONADO
+========================================================= */
+
+$nuevo_abonado =
+    $prestamo['abonado']
+    + $pago_mora
+    + $pago_capital;
+
+
+/* =========================================================
+   DETERMINAR ESTADO DEL PRÉSTAMO
+========================================================= */
 
 $estado = ($pendiente <= 0 && $mora <= 0)
     ? "Pagado"
     : ($mora > 0 ? "Mora" : "Activo");
 
+
+/* =========================================================
+   ACTUALIZAR PRÉSTAMO
+========================================================= */
+
 $sql = "
-UPDATE prestamos
-SET
-abonado=?,
-pendiente=?,
-mora=?,
-estado=?
-WHERE id=?";
+    UPDATE prestamos
+    SET
+        abonado = ?,
+        pendiente = ?,
+        mora = ?,
+        estado = ?
+    WHERE id = ?
+";
 
 $stmt = $conexion->prepare($sql);
+
 $stmt->execute([
     $nuevo_abonado,
     $pendiente,
@@ -206,89 +298,103 @@ $stmt->execute([
     $prestamo_id
 ]);
 
-// Si el préstamo quedó totalmente pagado,
-// marcar todas las cuotas restantes como pagadas.
-if ($estado === "Pagado") {
 
-    $sql = "UPDATE cuotas
-            SET
-                pagada = 1,
-                estado = 'Pagada',
-                fecha_pago = CURDATE(),
-                dias_atraso = 0,
-                mora = 0
-            WHERE prestamo_id = ?
-            AND pagada = 0";
+/* =========================================================
+   MARCAR LA CUOTA ACTUAL COMO PAGADA
+========================================================= */
+
+if ($pago_capital > 0 || $pago_mora > 0) {
+
+    $sql = "
+        UPDATE cuotas
+        SET
+            pagada = 1,
+            estado = 'Pagada',
+            fecha_pago = ?,
+            dias_atraso = 0,
+            mora = 0
+        WHERE id = ?
+    ";
 
     $stmt = $conexion->prepare($sql);
-    $stmt->execute([$prestamo_id]);
+
+    $stmt->execute([
+        $fechaPago,
+        $cuota['id']
+    ]);
 }
 
 
+/* =========================================================
+   SI EL PRÉSTAMO QUEDÓ PAGADO,
+   MARCAR LAS CUOTAS RESTANTES
+========================================================= */
+
+if ($estado === "Pagado") {
+
+    $sql = "
+        UPDATE cuotas
+        SET
+            pagada = 1,
+            estado = 'Pagada',
+            fecha_pago = COALESCE(fecha_pago, ?),
+            dias_atraso = 0,
+            mora = 0
+        WHERE prestamo_id = ?
+        AND pagada = 0
+    ";
+
+    $stmt = $conexion->prepare($sql);
+
+    $stmt->execute([
+        $fechaPago,
+        $prestamo_id
+    ]);
+}
+
+
+/* =========================================================
+   SALDO RESTANTE
+========================================================= */
+
 $saldo_total = $pendiente + $mora;
 
+
+/* =========================================================
+   REGISTRAR HISTORIAL DEL PAGO
+========================================================= */
+
 $sql = "
-INSERT INTO pagos
-(
-prestamo_id,
-valor_pago,
-pago_mora,
-pago_capital,
-saldo_restante,
-observacion
-)
-VALUES
-(?,?,?,?,?,?)";
+    INSERT INTO pagos
+    (
+        prestamo_id,
+        valor_pago,
+        fecha_pago,
+        pago_mora,
+        pago_capital,
+        saldo_restante,
+        observacion
+    )
+    VALUES
+    (?,?,?,?,?,?,?)
+";
 
 $stmt = $conexion->prepare($sql);
+
 $stmt->execute([
     $prestamo_id,
-    $_POST['valor_pago'],
+    $valor_pago,
+    $fechaPago,
     $pago_mora,
     $pago_capital,
     $saldo_total,
     ""
 ]);
 
-/* Marcar cuota como pagada */
-if ($pago_capital > 0 || $pago_mora > 0) {
 
-    $sql = "
-    UPDATE cuotas
-    SET
-        pagada = 1,
-        estado = 'Pagada',
-        fecha_pago = ?
-    WHERE id = ?";
+/* =========================================================
+ REDIRECCIÓN
+========================================================= */
 
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute([
-        date('Y-m-d'),
-        $cuota['id']
-    ]);
-}
-
-/* Si el préstamo quedó totalmente pagado,
-   marcar todas las cuotas restantes como pagadas */
-if ($estado === "Pagado") {
-
-    $sql = "
-    UPDATE cuotas
-    SET
-        pagada = 1,
-        estado = 'Pagada',
-        fecha_pago = COALESCE(fecha_pago, ?),
-        dias_atraso = 0,
-        mora = 0
-    WHERE prestamo_id = ?
-    AND pagada = 0";
-
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute([
-        date('Y-m-d'),
-        $prestamo_id
-    ]);
-}
-
-header("Location:listado.php");
+header("Location: listado.php");
 exit;

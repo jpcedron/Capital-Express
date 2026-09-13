@@ -29,12 +29,26 @@ $clienteInactivo = isset($_GET['error']) && $_GET['error'] === 'cliente_inactivo
 <!-- TOP BAR -->
 <nav class="top-bar">
   <div class="container-fluid px-5">
-    <div class="d-flex align-items-center gap-3">
-      <div class="brand-icon"><i class="bi bi-bank2"></i></div>
-      <div>
-        <div class="brand" style="font-family: 'Playfair Display', serif;">Capital Express</div>
-        <div class="tagline">Finanzas con Confianza</div>
+    <div class="d-flex align-items-center justify-content-between">
+      
+      <!-- Marca y Logo (Intactos) -->
+      <div class="d-flex align-items-center gap-3">
+        <div class="brand-icon"><i class="bi bi-bank2"></i></div>
+        <div>
+          <div class="brand" style="font-family: 'Playfair Display', serif;">Capital Express</div>
+          <div class="tagline">Finanzas con Confianza</div>
+        </div>
       </div>
+      <!-- Links Agregados -->
+      <nav class="d-none d-md-flex align-items-center gap-1 ms-auto">
+        <a href="public/dashboard.php" class="nav-link-custom">
+          <i class="bi bi-person-circle me-1"></i>Panel
+        </a>
+        <a href="listado.php" class="nav-link-custom">
+          <i class="bi bi-list-ul me-1"></i>Listado
+        </a>
+      </nav>
+
     </div>
   </div>
 </nav>

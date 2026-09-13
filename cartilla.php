@@ -24,12 +24,14 @@ $sql = "SELECT
             ON prestamos.cliente_id = clientes.id
         WHERE prestamos.id = ?";
 
-//$sql =
-//"SELECT * FROM prestamos WHERE id=?";
+$stmt = $conexion->prepare($sql);
+$stmt->execute([$id]);
 
-$stmt = $conexion->prepare($sql); $stmt->execute([ $id ]);
-$prestamo = $stmt->fetch( PDO::FETCH_ASSOC );
+$prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
+/* =========================================================
+   ÚLTIMA CUOTA
+   ========================================================= */
 
 $sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
         FROM cuotas
@@ -46,131 +48,67 @@ if (!empty($datosCuota['ultima_cuota'])) {
     $fechaLimite = new DateTime($datosCuota['ultima_cuota']);
 }
 
-$hoy = new DateTime();
-
-$sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
-        FROM cuotas
-        WHERE prestamo_id = ?";
-
-$stmt = $conexion->prepare($sql);
-$stmt->execute([$id]);
-
-$datosCuota = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$fechaLimite = null;
-
-if (!empty($datosCuota['ultima_cuota'])) {
-    $fechaLimite = new DateTime($datosCuota['ultima_cuota']);
-}
-
-$diasAtraso = 0;
+$hoy = new DateTime(); $diasAtraso = 0;
 
 $mora = 0;
 
-$totalActual =
-$prestamo['pendiente'];
+$totalActual = $prestamo['pendiente'];
 
 /* porcentaje inicial */
-
 $porcentajeMora = 0;
 
+/* =========================================================
+   CALCULAR MORA
+   ========================================================= */
+
 if (
-    $prestamo['pendiente'] > 0 &&
-    $fechaLimite !== null &&
-    $hoy > $fechaLimite
-) {
+    $prestamo['pendiente'] > 0 && $fechaLimite !== null && $hoy > $fechaLimite
+) { $diasAtraso = $fechaLimite ->diff(
+        $hoy
+    ) ->days;
 
-$diasAtraso =
-$fechaLimite
-->diff(
-$hoy
-)
-->days;
+    /* calcular porcentaje */
+    if ( $diasAtraso >= 3 && $diasAtraso <= 14
+    ) {
+        $porcentajeMora = 5;
+    }
+    elseif ( $diasAtraso >= 15 && $diasAtraso <= 29
+    ) {
+        $porcentajeMora = 10;
+    }
+    elseif ( $diasAtraso >= 30 && $diasAtraso <= 44
+    ) {
+        $porcentajeMora = 15;
+    }
+    elseif ( $diasAtraso >= 45
+    ) {
+        $porcentajeMora = 20;
+    }
 
-/* calcular porcentaje */
+    /* calcular mora */
+    $mora = $prestamo['pendiente'] *
+    ( $porcentajeMora / 100 );
 
-if(
-$diasAtraso >= 3
-&&
-$diasAtraso <= 14
-){
-
-$porcentajeMora = 5;
-
+    $totalActual = $prestamo['pendiente'] + $mora;
 }
-elseif(
-$diasAtraso >= 15
-&&
-$diasAtraso <= 29
-){
-
-$porcentajeMora = 10;
-
-}
-elseif(
-$diasAtraso >= 30
-&&
-$diasAtraso <= 44
-){
-
-$porcentajeMora = 15;
-
-}
-elseif(
-$diasAtraso >= 45
-){
-
-$porcentajeMora = 20;
-
-}
-
-/* calcular mora */
-
-$mora =
-
-$prestamo['pendiente']
-
-*
-
-(
-
-$porcentajeMora
-
-/
-
-100
-
-);
-
-$totalActual =
-
-$prestamo['pendiente']
-
-+
-
-$mora;
-
-}
-
-/* HISTORIAL */
+/* =========================================================
+   HISTORIAL DE PAGOS
+   ========================================================= */
 
 $sql = "
-
 SELECT *
-
 FROM pagos
-
 WHERE prestamo_id=?
-
 ORDER BY fecha_pago DESC
-
 ";
 
-$stmt =
-$conexion->prepare($sql); $stmt->execute([
-$id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
+$stmt = $conexion->prepare($sql);
+$stmt->execute([ $id ]);
+
+$pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
