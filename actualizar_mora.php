@@ -2,174 +2,211 @@
 
 function actualizarMora($conexion, $prestamo_id)
 {
-    // Buscar el préstamo
-    $sql = "SELECT * FROM prestamos WHERE id=?";
+    // ==========================================================
+    // 1. OBTENER EL PRÉSTAMO
+    // ==========================================================
+    $sql = "SELECT *
+            FROM prestamos
+            WHERE id = ?";
+
     $stmt = $conexion->prepare($sql);
     $stmt->execute([$prestamo_id]);
 
     $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$prestamo) {
-        return;
+        return false;
     }
 
-    // Buscar la primera cuota pendiente
+
+    // ==========================================================
+    // 2. OBTENER TODAS LAS CUOTAS NO PAGADAS
+    // ==========================================================
     $sql = "SELECT *
             FROM cuotas
-            WHERE prestamo_id=?
-            AND pagada=0
-            ORDER BY numero_cuota ASC
-            LIMIT 1";
+            WHERE prestamo_id = ?
+            AND pagada = 0
+            ORDER BY numero_cuota ASC";
 
     $stmt = $conexion->prepare($sql);
     $stmt->execute([$prestamo_id]);
 
-    $cuota = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Buscar la fecha de la última cuota
-    $sql = "SELECT MAX(fecha_vencimiento) AS ultima_fecha
-            FROM cuotas
-            WHERE prestamo_id=?";
-
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute([$prestamo_id]);
-
-    $ultimaCuota = $stmt->fetch(PDO::FETCH_ASSOC);
+    $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-    // Si no hay cuotas pendientes, el préstamo está pagado
-    if (!$cuota) {
+    // ==========================================================
+    // 3. SI NO HAY CUOTAS PENDIENTES
+    // ==========================================================
+    if (!$cuotas) {
 
         $sql = "UPDATE prestamos
-                SET estado='Pagado',
-                    mora=0
-                WHERE id=?";
+                SET estado = 'Pagado',
+                    mora = 0,
+                    porcentaje_mora = 0
+                WHERE id = ?";
 
         $stmt = $conexion->prepare($sql);
         $stmt->execute([$prestamo_id]);
 
-        return;
+        return true;
     }
 
-    // Calcular días de atraso
+
+    // ==========================================================
+    // 4. VARIABLES GENERALES
+    // ==========================================================
     $hoy = new DateTime();
 
-    $prestamoFinalizado = false;
+    $moraTotal = 0;
+    $porcentajeMaximo = 0;
 
-    if (!empty($ultimaCuota['ultima_fecha'])) {
 
-        $fechaFinal = new DateTime($ultimaCuota['ultima_fecha']);
+    // ==========================================================
+    // 5. RECORRER TODAS LAS CUOTAS PENDIENTES
+    // ==========================================================
+    foreach ($cuotas as $cuota) {
 
-        if ($hoy > $fechaFinal) {
+        $fechaVencimiento = new DateTime(
+            $cuota['fecha_vencimiento']
+        );
 
-            $diasFinal = $fechaFinal->diff($hoy)->days;
+        $diasAtraso = 0;
 
-            if ($diasFinal >= 3) {
-                $prestamoFinalizado = true;
-            }
+        // ------------------------------------------------------
+        // Calcular días de atraso
+        // ------------------------------------------------------
+        if ($hoy > $fechaVencimiento) {
+
+            $diasAtraso = $fechaVencimiento
+                ->diff($hoy)
+                ->days;
+        }
+
+
+        // ------------------------------------------------------
+        // Determinar porcentaje de mora
+        // ------------------------------------------------------
+        $porcentaje = 0;
+
+        if ($diasAtraso >= 3 && $diasAtraso <= 14) {
+
+            $porcentaje = 5;
+
+        } elseif ($diasAtraso >= 15 && $diasAtraso <= 29) {
+
+            $porcentaje = 10;
+
+        } elseif ($diasAtraso >= 30 && $diasAtraso <= 44) {
+
+            $porcentaje = 15;
+
+        } elseif ($diasAtraso >= 45) {
+
+            $porcentaje = 20;
+        }
+
+
+        // ------------------------------------------------------
+        // Calcular mora
+        // ------------------------------------------------------
+        $moraCuota = 0;
+
+        if ($porcentaje > 0) {
+
+            $semanas = max(
+                1,
+                ceil($diasAtraso / 7)
+            );
+
+            $valorCuota = floatval($cuota['valor']);
+
+            $moraCuota = round(
+                $valorCuota *
+                ($porcentaje / 100) *
+                $semanas,
+                2
+            );
+        }
+
+
+        // ------------------------------------------------------
+        // Estado de la cuota
+        // ------------------------------------------------------
+        if ($moraCuota > 0) {
+
+            $estadoCuota = 'Mora';
+
+        } else {
+
+            $estadoCuota = 'Pendiente';
+        }
+
+
+        // ------------------------------------------------------
+        // Actualizar cuota
+        // ------------------------------------------------------
+        $sql = "UPDATE cuotas
+                SET dias_atraso = ?,
+                    mora = ?,
+                    estado = ?
+                WHERE id = ?";
+
+        $stmt = $conexion->prepare($sql);
+
+        $stmt->execute([
+            $diasAtraso,
+            $moraCuota,
+            $estadoCuota,
+            $cuota['id']
+        ]);
+
+
+        // ------------------------------------------------------
+        // Acumular mora total del préstamo
+        // ------------------------------------------------------
+        $moraTotal += $moraCuota;
+
+
+        // Guardamos el porcentaje más alto
+        // entre las cuotas que estén en mora
+        if ($porcentaje > $porcentajeMaximo) {
+
+            $porcentajeMaximo = $porcentaje;
         }
     }
 
-    if ($prestamoFinalizado) {
 
-    $fecha = new DateTime($ultimaCuota['ultima_fecha']);
+    // ==========================================================
+    // 6. DETERMINAR ESTADO DEL PRÉSTAMO
+    // ==========================================================
+    if ($moraTotal > 0) {
 
-    } else {
-
-        $fecha = new DateTime($cuota['fecha_vencimiento']);
-
-    }
-
-    $dias_atraso = 0;
-
-    if ($hoy > $fecha) {
-
-        $dias_atraso = $fecha->diff($hoy)->days;
-
-    }
-
-    // Definir la base de la mora
-    if ($prestamoFinalizado) {
-
-        $baseMora = floatval($prestamo['pendiente']);
+        $estadoPrestamo = 'Mora';
 
     } else {
 
-        $baseMora = floatval($cuota['valor']);
+        $estadoPrestamo = 'Activo';
     }
 
-    $porcentaje = 0;
 
-if ($dias_atraso >= 3) {
-
-    if ($dias_atraso <= 14) {
-
-        $porcentaje = 5;
-
-    } elseif ($dias_atraso <= 29) {
-
-        $porcentaje = 10;
-
-    } elseif ($dias_atraso <= 44) {
-
-        $porcentaje = 15;
-
-    } else {
-
-        $porcentaje = 20;
-    }
-}
-
-$mora = 0;
-
-if ($porcentaje > 0) {
-
-    $semanas = max(1, ceil(($dias_atraso - 2) / 7));
-
-    $mora = round(
-        $baseMora *
-        ($porcentaje / 100) *
-        $semanas,
-        2
-    );
-}
-
-    // Guardar los días de atraso en la cuota
-    $estadoCuota = ($mora > 0) ? "Mora" : "Pendiente";
-
-    $sql = "
-    UPDATE cuotas
-    SET
-        dias_atraso=?,
-        mora=?,
-        estado=?
-    WHERE id=?";
-
-    $stmt = $conexion->prepare($sql);
-    $stmt->execute([
-        $dias_atraso,
-        $mora,
-        $estadoCuota,
-        $cuota['id']
-    ]);¿
-
-
-    $estadoPrestamo = ($mora > 0) ? "Mora" : "Activo";
-
-    $sql = "
-    UPDATE prestamos
-    SET
-        mora=?,
-        porcentaje_mora=?,
-        estado=?
-    WHERE id=?";
+    // ==========================================================
+    // 7. ACTUALIZAR PRÉSTAMO
+    // ==========================================================
+    $sql = "UPDATE prestamos
+            SET mora = ?,
+                porcentaje_mora = ?,
+                estado = ?
+            WHERE id = ?";
 
     $stmt = $conexion->prepare($sql);
 
     $stmt->execute([
-        $mora,
-        $porcentaje,
+        $moraTotal,
+        $porcentajeMaximo,
         $estadoPrestamo,
         $prestamo_id
     ]);
+
+
+    return true;
 }

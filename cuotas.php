@@ -2,25 +2,46 @@
 
 require_once "public/auth_admin.php";
 require_once "config/conexion.php";
+require_once "actualizar_mora.php";
 
 $conexion = (new Conexion())->conectar();
 
-$prestamo_id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+
+// ==========================================================
+// VALIDAR ID DEL PRÉSTAMO
+// ==========================================================
+
+$prestamo_id = filter_input(
+    INPUT_GET,
+    'id',
+    FILTER_VALIDATE_INT
+);
 
 if (!$prestamo_id) {
-    die("Préstamo no encontrado.");
+    die("ID DEL PRÉSTAMO NO VÁLIDO");
 }
 
 
-/* Obtener información del préstamo */
-$sql = "SELECT
-            prestamos.*,
-            clientes.nombre AS cliente_nombre,
-            clientes.cedula AS cliente_cedula
-        FROM prestamos
-        INNER JOIN clientes
-            ON prestamos.cliente_id = clientes.id
-        WHERE prestamos.id = ?";
+// ==========================================================
+// ACTUALIZAR MORA
+// ==========================================================
+
+actualizarMora($conexion, $prestamo_id);
+
+
+// ==========================================================
+// OBTENER INFORMACIÓN DEL PRÉSTAMO Y CLIENTE
+// ==========================================================
+
+$sql = "SELECT 
+            p.*,
+            c.nombre AS cliente_nombre,
+            c.cedula AS cliente_cedula,
+            c.telefono AS cliente_telefono
+        FROM prestamos p
+        INNER JOIN clientes c 
+            ON c.id = p.cliente_id
+        WHERE p.id = ?";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$prestamo_id]);
@@ -28,20 +49,50 @@ $stmt->execute([$prestamo_id]);
 $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$prestamo) {
-    die("Préstamo no encontrado.");
+    die("El préstamo no existe.");
 }
 
-/* Obtener cuotas */
+
+// ==========================================================
+// OBTENER TODAS LAS CUOTAS
+// ==========================================================
 
 $sql = "SELECT *
         FROM cuotas
-        WHERE prestamo_id=?
+        WHERE prestamo_id = ?
         ORDER BY numero_cuota ASC";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute([$prestamo_id]);
 
 $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+// ==========================================================
+// RESUMEN DE CUOTAS
+// ==========================================================
+
+$totalCuotas = count($cuotas);
+
+$cuotasPagadas = 0;
+$cuotasPendientes = 0;
+$cuotasEnMora = 0;
+
+foreach ($cuotas as $cuota) {
+
+    if ((int)$cuota['pagada'] === 1) {
+
+        $cuotasPagadas++;
+
+    } elseif (($cuota['estado'] ?? '') === 'Mora') {
+
+        $cuotasEnMora++;
+
+    } else {
+
+        $cuotasPendientes++;
+    }
+}
 
 ?>
 

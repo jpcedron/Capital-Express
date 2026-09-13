@@ -275,9 +275,13 @@ $id ]); $pagos = $stmt->fetchAll( PDO::FETCH_ASSOC );
                     <span class="ce-info-label">Monto</span>
                     <span class="ce-info-value money">$<?= number_format($prestamo['monto']) ?></span>
                 </div>
-                <div class="ce-info-item">
-                    <span class="ce-info-label">Cuotas</span>
-                    <span class="ce-info-value"><?= $prestamo['cuotas'] ?></span>
+                 <div class="ce-info-item">
+                    <span class="ce-info-label">Interés</span>
+                    <span class="ce-info-value money"><?= number_format($prestamo['interes'], 2) ?>%</span>
+                </div>
+                 <div class="ce-info-item">
+                    <span class="ce-info-label">Total Pactado</span>
+                    <span class="ce-info-value money">$<?= number_format($prestamo['total_pagar']) ?></span>
                 </div>
                 <div class="ce-info-item">
                     <span class="ce-info-label">Valor cuota</span>

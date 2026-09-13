@@ -672,7 +672,7 @@ if($hora < 12){
                                     <?php endif; ?>
                                 </div>
                                 <div>
-                                    <a href="listado.php?id=<?= $cliente['prestamo_id'] ?>" class="btn btn-sm btn-danger">
+                                    <a href="../listado.php?id=<?= $cliente['prestamo_id'] ?>" class="btn btn-sm btn-danger">
                                         <i class="fa-solid fa-eye me-1"></i>
                                         Ver préstamo
                                     </a>
