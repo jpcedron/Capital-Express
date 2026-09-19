@@ -57,24 +57,18 @@ $stmt->execute([$id]);
 $cuotaMora = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
-/* Valores iniciales */
-
 $diasAtraso = 0;
 $porcentajeMora = 0;
 
 
-/*
- * Si existe una cuota en mora, utilizamos
+/*  Si existe una cuota en mora, utilizamos
  * los días de atraso que ya fueron calculados
- * y guardados por actualizarMora().
- */
-
+ * y guardados por actualizarMora(). */
 if ($cuotaMora) {
 
     $diasAtraso = (int) $cuotaMora['dias_atraso'];
 
     /* * Determinar el porcentaje correspondiente ,* a los días de atraso de esta cuota. */
-
     if ($diasAtraso >= 3 && $diasAtraso <= 14) {
 
         $porcentajeMora = 5;
@@ -92,6 +86,19 @@ if ($cuotaMora) {
         $porcentajeMora = 20;
     }
 }
+
+/* =========================================================
+   ÚLTIMA CUOTA
+   ========================================================= */
+
+$sql = "SELECT MAX(fecha_vencimiento) AS ultima_cuota
+        FROM cuotas
+        WHERE prestamo_id = ?";
+
+$stmt = $conexion->prepare($sql);
+$stmt->execute([$id]);
+
+$datosCuota = $stmt->fetch(PDO::FETCH_ASSOC);
 
 /* =========================================================
    ÚLTIMA CUOTA
@@ -133,7 +140,6 @@ if (
         $hoy
     ) ->days;
 
-    /* calcular porcentaje */
     if ( $diasAtraso >= 3 && $diasAtraso <= 14
     ) {
         $porcentajeMora = 5;
@@ -355,7 +361,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <span class="info-label">Última cuota</span>
                     <span class="info-value">
                         <?= $datosCuota['ultima_cuota']
-                            ? date('d/m/Y', strtotime($datosCuota['ultima_cuota']))
+                             ? date('d/m/Y', strtotime($datosCuota['ultima_cuota']))
                             : 'No registrada'; ?>
                     </span>
                 </div>

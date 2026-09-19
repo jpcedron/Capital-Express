@@ -1,5 +1,6 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
@@ -346,7 +347,6 @@ if ($_POST['frecuencia'] === "Semanal") {
         }
     }
 }
-
 
 /* =========================================================
    11. REGRESAR AL LISTADO

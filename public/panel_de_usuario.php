@@ -33,7 +33,7 @@ $cedula = $_SESSION["cliente_cedula"];
     <div class="brand-icon brand-heading">CE</div>
     <div class="brand-text">
       <div class="name brand-heading">Capital Express</div>
-      <div class="tagline">Gestión de Préstamos</div>
+      <div class="tagline">Finanzas con Confianza</div>
     </div>
   </a>
 

@@ -1,5 +1,6 @@
 <?php
 
+require_once "public/auth_admin.php";
 require_once "vendor/autoload.php";
 require_once "config/conexion.php";
 
