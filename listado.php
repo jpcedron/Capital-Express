@@ -1,6 +1,6 @@
 <?php
 
-require_once "public/auth_admin.php";
+require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
@@ -51,7 +51,7 @@ $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
       </div>
       <nav class="d-none d-md-flex align-items-center gap-1">
-        <a href="public/dashboard.php" class="nav-link-custom">
+        <a href="public/admin/dashboard.php" class="nav-link-custom">
           <i class="bi bi-person-circle me-1"></i>Panel
         </a>
       </nav>

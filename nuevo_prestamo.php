@@ -1,6 +1,6 @@
 <?php
 
-require_once "public/auth_admin.php";
+require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 
 ?>
@@ -35,7 +35,7 @@ require_once "config/conexion.php";
     <nav class="d-none d-md-flex align-items-center gap-1">
       <a href="index.php" class="nav-link active"><i class="bi bi-file-earmark-plus me-1"></i>Nuevo préstamo</a>
       <a href="listado.php" class="nav-link"><i class="bi bi-list-ul me-1"></i>Listado</a>
-      <a href="public/dashboard.php" class="nav-link"><i class="bi bi-person-circle me-1"></i>Panel</a>
+      <a href="public/admin/dashboard.php" class="nav-link"><i class="bi bi-person-circle me-1"></i>Panel</a>
     </nav>
   </div>
 </header>

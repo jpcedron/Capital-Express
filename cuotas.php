@@ -1,6 +1,6 @@
 <?php
 
-require_once "public/auth_admin.php";
+require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 require_once "actualizar_mora.php";
 
@@ -133,7 +133,7 @@ foreach ($cuotas as $cuota) {
 
     <!-- ===== BREADCRUMB ===== -->
     <div class="breadcrumb-row">
-        <a href="public/dashboard.php">Panel</a>
+        <a href="public/admin/dashboard.php">Panel</a>
         <span class="sep">/</span>
         <a href="listado.php">Préstamos</a>
         <span class="sep">/</span>

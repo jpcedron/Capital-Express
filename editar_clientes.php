@@ -1,6 +1,6 @@
 <?php
 
-require_once "public/auth_admin.php";
+require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 $conexion = (new Conexion())->conectar();
 
@@ -132,7 +132,7 @@ if (!$cliente) {
 <div class="page-wrap">
 
     <div class="breadcrumb-row">
-        <a href="public/dashboard.php">Panel</a>
+        <a href="public/admin/dashboard.php">Panel</a>
         <span class="sep">/</span>
         <a href="gestionar_clientes.php">Clientes</a>
         <span class="sep">/</span>

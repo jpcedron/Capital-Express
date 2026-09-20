@@ -1,6 +1,6 @@
 <?php
 
-require_once "public/auth_admin.php";
+require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
@@ -15,7 +15,6 @@ $valor_pago = filter_input( INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT );
 if (!$prestamo_id || $valor_pago === false || $valor_pago <= 0) {
     die("Datos de pago inválidos.");
 }
-
 /*
  * Una única fecha para todo el registro del pago.
  * Se utilizará tanto en pagos como en cuotas.
