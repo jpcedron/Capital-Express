@@ -1,7 +1,7 @@
 <?php
 
 require_once "auth_admin.php";
-require_once "../config/conexion.php";
+require_once "../../config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
@@ -213,7 +213,7 @@ if($hora < 12){
 <title>Dashboard | Capital Express</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-<link rel="stylesheet" href="../css/dashboard.css">
+<link rel="stylesheet" href="../../css/dashboard.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -235,22 +235,22 @@ if($hora < 12){
             Dashboard
         </a>
 
-        <a href="../gestionar_clientes.php">
+        <a href="../../gestionar_clientes.php">
             <i class="fa-solid fa-users"></i>
             Clientes
         </a>
 
-        <a href="../nuevo_prestamo.php">
+        <a href="../../nuevo_prestamo.php">
             <i class="fa-solid fa-money-bill-wave"></i>
             Préstamo
         </a>
 
-        <a href="../listado.php">
+        <a href="../../listado.php">
             <i class="fa-solid fa-wallet"></i>
             Pagos
         </a>
 
-        <a href="../listado.php">
+        <a href="../../cuotas.php">
             <i class="fa-solid fa-calendar-days"></i>
             Cuotas
         </a>
@@ -363,7 +363,7 @@ if($hora < 12){
 
                         <!-- NUEVO PRÉSTAMO -->
                         <div class="col-xl-3 col-md-6">
-                            <a href="../index.php" class="quick-action">
+                            <a href="../../index.php" class="quick-action">
                                 <div class="quick-action-icon">
                                     <i class="fa-solid fa-file-circle-plus"></i>
                                 </div>
@@ -377,7 +377,7 @@ if($hora < 12){
 
                         <!-- LISTADO DE PRÉSTAMOS -->
                         <div class="col-xl-3 col-md-6">
-                            <a href="../nuevo_prestamo.php" class="quick-action">
+                            <a href="../../nuevo_prestamo.php" class="quick-action">
                                 <div class="quick-action-icon">
                                     <i class="fa-solid fa-clipboard-list"></i>
                                 </div>
@@ -391,7 +391,7 @@ if($hora < 12){
 
                         <!-- GESTIONAR CLIENTES -->
                         <div class="col-xl-3 col-md-6">
-                            <a href="../gestionar_clientes.php" class="quick-action">
+                            <a href="../../gestionar_clientes.php" class="quick-action">
                                 <div class="quick-action-icon">
                                     <i class="fa-solid fa-users"></i>
                                 </div>
@@ -405,7 +405,7 @@ if($hora < 12){
 
                         <!-- REGISTRAR PAGO -->
                         <div class="col-xl-3 col-md-6">
-                            <a href="../listado.php" class="quick-action">
+                            <a href="../../listado.php" class="quick-action">
                                 <div class="quick-action-icon">
                                     <i class="fa-solid fa-money-bill-transfer"></i>
                                 </div>

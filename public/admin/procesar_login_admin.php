@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once "../config/conexion.php";
+require_once "../../config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
@@ -24,7 +24,7 @@ if ($usuario === "" || $password === "") {
 
     $_SESSION["error_login_admin"] = "Debes ingresar el usuario y la contraseña.";
 
-    header("Location: login_admin.php");
+    header("Location:login_admin.php");
     exit;
 }
 

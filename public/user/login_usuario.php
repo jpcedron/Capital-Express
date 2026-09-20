@@ -121,7 +121,6 @@ if (isset($_SESSION["cliente_id"])) {
                   <i class="bi bi-exclamation-triangle-fill me-2"></i>
                   <!-- Escapar el mensaje de error para prevenir XSS *--> 
                   <?= htmlspecialchars($_SESSION["error_login"], ENT_QUOTES, 'UTF-8'); ?>
-                  
                   <button
                       type="button"
                       class="btn-close"
