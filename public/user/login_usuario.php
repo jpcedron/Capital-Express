@@ -6,6 +6,8 @@ if (isset($_SESSION["cliente_id"])) {
     exit;
 }
 
+//<?= $_SESSION["error_login"]; 
+
 ?>
 
 <!DOCTYPE html>
@@ -117,8 +119,9 @@ if (isset($_SESSION["cliente_id"])) {
           ?>
               <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                   <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                  <?= $_SESSION["error_login"]; ?>
-
+                  <!-- Escapar el mensaje de error para prevenir XSS *--> 
+                  <?= htmlspecialchars($_SESSION["error_login"], ENT_QUOTES, 'UTF-8'); ?>
+                  
                   <button
                       type="button"
                       class="btn-close"

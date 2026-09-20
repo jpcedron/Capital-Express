@@ -2,6 +2,7 @@
 
 session_start();
 
+// <?= $_SESSION["error_login_admin"]; 
 ?>
 
 <!DOCTYPE html>
@@ -128,7 +129,8 @@ session_start();
           ?>
               <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
                   <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                  <?= $_SESSION["error_login_admin"]; ?>
+                  <!-- Escapar el mensaje de error para prevenir XSS *-->
+                  <?= htmlspecialchars($_SESSION["error_login_admin"], ENT_QUOTES, 'UTF-8'); ?>
                   <button
                       type="button"
                       class="btn-close"
