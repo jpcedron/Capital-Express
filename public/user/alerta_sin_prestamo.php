@@ -23,7 +23,7 @@ Swal.fire({
     allowOutsideClick: false
 }).then(() => {
 
-    window.location.href = "../public/panel_de_usuario.php";
+    window.location.href = "panel_de_usuario.php";
 
 });
 

@@ -100,7 +100,7 @@ $recibo_items = [
                     <a href="#contacto" class="btn btn-outline-light btn-lg px-4">
                         <i class="bi bi-envelope me-2"></i>Contáctanos
                     </a>
-                    <a href="login.php" class="btn btn-outline-light btn-lg px-4">
+                    <a href="user/login_usuario.php" class="btn btn-outline-light btn-lg px-4">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
                     </a>
                 </div>

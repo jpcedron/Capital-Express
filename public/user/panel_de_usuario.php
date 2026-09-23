@@ -1,7 +1,7 @@
 <?php
 
 require_once "auth_cliente.php";
-require_once "../config/conexion.php";
+require_once "../../config/conexion.php";
 
 $nombreUsuario = $_SESSION["cliente_nombre"];
 $cedula = $_SESSION["cliente_cedula"];
@@ -20,7 +20,7 @@ $cedula = $_SESSION["cliente_cedula"];
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <!-- En el navbar -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/panel_de_usuario.css"/>
+  <link rel="stylesheet" href="../../css/panel_de_usuario.css"/>
   
 </head>
 <body>
@@ -43,7 +43,7 @@ $cedula = $_SESSION["cliente_cedula"];
       <i class="bi bi-person-circle"></i>
       <span><?= htmlspecialchars($nombreUsuario) ?></span>
     </div>
-    <a href="logout.php" class="btn-logout">
+    <a href="logout_usuario.php" class="btn-logout">
       <i class="bi bi-box-arrow-right"></i>
       Cerrar Sesión
     </a>

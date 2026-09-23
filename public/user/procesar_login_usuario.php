@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once "../config/conexion.php";
+require_once "../../config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
@@ -12,10 +12,11 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     exit;
 }
 
+
 // Verificar que los campos existan
 if (!isset($_POST["cedula"], $_POST["password"])) {
     $_SESSION["error_login"] = "Debes completar todos los campos.";
-    header("Location: login.php");
+    header("Location: login_usuario.php");
     exit;
 }
 
@@ -26,7 +27,7 @@ $password = $_POST["password"];
 // Verificar que no estén vacíos
 if ($cedula === "" || $password === "") {
     $_SESSION["error_login"] = "Debes completar todos los campos.";
-    header("Location: login.php");
+    header("Location: login_usuario.php");
     exit;
 }
 
@@ -40,14 +41,14 @@ $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 // Verificar si existe el cliente
 if (!$cliente) {
     $_SESSION["error_login"] = "La cédula ingresada no se encuentra registrada.";
-    header("Location: login.php");
+    header("Location: login_usuario.php");
     exit;
 }
 
 // Verificar la contraseña
 if (!password_verify($password, $cliente["password"])) {
     $_SESSION["error_login"] = "La contraseña ingresada es incorrecta.";
-    header("Location: login.php");
+    header("Location: public/user/login_usuario.php");
     exit;
 }
 

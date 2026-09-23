@@ -19,7 +19,7 @@ if (isset($_SESSION["cliente_id"])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="../css/login.css" rel="stylesheet">
+  <link href="../../css/login.css" rel="stylesheet">
 </head>
 <body class="bg-light">
 
@@ -134,7 +134,7 @@ if (isset($_SESSION["cliente_id"])) {
           ?>
 
         <!-- Formulario -->
-        <form action="procesar_login.php" method="POST" novalidate>
+        <form action="procesar_login_usuario.php" method="POST" novalidate>
 
           <!-- Cédula -->
           <div class="mb-4">

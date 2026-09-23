@@ -1,7 +1,7 @@
 <?php
 
 require_once "auth_cliente.php";
-require_once "../config/conexion.php";
+require_once "../../config/conexion.php";
 
 
 // Conexión a la base de datos
