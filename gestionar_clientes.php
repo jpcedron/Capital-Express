@@ -39,24 +39,58 @@ $clienteEliminado = isset($_GET['eliminado']) && $_GET['eliminado'] == '1';
 </head>
 <body>
 
-<!-- ========================= -->
-<!-- TOP BAR -->
-<!-- ========================= -->
+<!-- ========================= 
+ TOP BAR
+ =========================-->
+
 <header class="ce-topbar">
   <div class="container d-flex align-items-center justify-content-between py-2">
     <div class="d-flex align-items-center gap-2">
       <span class="ce-mark" style="font-family: 'Playfair Display', serif;">CE</span>
       <div>
-        <div class="ce-name" style="font-family: 'Playfair Display', serif;">Capital Express</div>
+        <div class="ce-name" style="font-family: 'Playfair Display', serif;">
+          Capital Express
+        </div>
         <div class="ce-tag">Finanzas con Confianza</div>
       </div>
     </div>
+    <!-- MENÚ DESKTOP -->
     <nav class="d-none d-md-flex align-items-center gap-1">
-      <a href="index.php" class="nav-link"><i class="bi bi-file-earmark-plus me-1"></i>Nuevo préstamo</a>
-      <a href="listado.php" class="nav-link"><i class="bi bi-list-ul me-1"></i>Listado</a>
-      <!--<a href="gestionar_clientes.php" class="nav-link active"><i class="bi bi-people-fill me-1"></i>Clientes</a>-->
-      <a href="public/admin/dashboard.php" class="nav-link"><i class="bi bi-person-circle me-1"></i>Panel</a>
+      <a href="index.php" class="nav-link">
+        <i class="bi bi-file-earmark-plus me-1"></i>Nuevo préstamo
+      </a>
+      <a href="listado.php" class="nav-link">
+        <i class="bi bi-list-ul me-1"></i>Listado
+      </a>
+      <a href="public/admin/dashboard.php" class="nav-link">
+        <i class="bi bi-person-circle me-1"></i>Panel
+      </a>
     </nav>
+    <!-- BOTÓN MENÚ MÓVIL -->
+    <button
+      type="button"
+      class="ce-mobile-menu-btn d-md-none"
+      onclick="configurarMenuMovil()"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      id="ceMobileMenuBtn">
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
+  <!-- MENÚ MÓVIL -->
+  <div class="ce-mobile-menu d-md-none" id="ceMobileMenu">
+    <a href="index.php" class="nav-link">
+      <i class="bi bi-file-earmark-plus me-2"></i>
+      Nuevo préstamo
+    </a>
+    <a href="listado.php" class="nav-link">
+      <i class="bi bi-list-ul me-2"></i>
+      Listado
+    </a>
+    <a href="public/admin/dashboard.php" class="nav-link">
+      <i class="bi bi-person-circle me-2"></i>
+      Panel
+    </a>
   </div>
 </header>
 
@@ -272,6 +306,32 @@ Swal.fire({
 </script>
 
 <?php endif; ?>
+
+<!--funcion de configuración del menú móvil -->
+<script>
+
+function configurarMenuMovil() {
+
+    const menu = document.getElementById('ceMobileMenu');
+    const boton = document.getElementById('ceMobileMenuBtn');
+
+    if (!menu || !boton) {
+        return;
+    }
+
+    menu.classList.toggle('show');
+
+    const abierto = menu.classList.contains('show');
+
+    boton.setAttribute('aria-expanded', abierto);
+
+    if (abierto) {
+        boton.innerHTML = '<i class="bi bi-x-lg"></i>';
+    } else {
+        boton.innerHTML = '<i class="bi bi-list"></i>';
+    }
+}
+</script>
 
 </body>
 </html>

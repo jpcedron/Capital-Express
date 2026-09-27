@@ -496,3 +496,55 @@ font-family: 'Playfair Display', serif;
     align-items: flex-start;
   }
 }
+
+/* =========================================================
+   MENÚ MÓVIL
+   ========================================================= */
+
+.ce-mobile-menu-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(232, 200, 118, 0.35);
+  border-radius: 9px;
+  background-color: linear-gradient(145deg, var(--ce-gold) 0%, var(--ce-gold-dark) 100%);
+  color: var(--ce-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ce-mobile-menu-btn:hover {
+  background-color: rgba(232, 200, 118, 0.18);
+  color: var(--ce-gold);
+}
+
+.ce-mobile-menu {
+  display: none;
+  padding: 0.5rem 1rem 0.8rem;
+  border-top: 1px solid rgba(232, 200, 118, 0.15);
+  background-color: linear-gradient(145deg, var(--ce-gold) 0%, var(--ce-gold-dark) 100%);
+}
+
+.ce-mobile-menu.show {
+  display: block;
+}
+
+.ce-mobile-menu .nav-link {
+  display: flex;
+  align-items: center;
+  color: #c7d2e6;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ce-mobile-menu .nav-link.active {
+    background-color: rgba(232, 200, 118, 0.12);
+    color: var(--ce-gold) !important;
+}

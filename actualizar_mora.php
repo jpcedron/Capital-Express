@@ -207,6 +207,5 @@ function actualizarMora($conexion, $prestamo_id)
         $prestamo_id
     ]);
 
-
     return true;
 }

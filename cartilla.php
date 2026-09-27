@@ -430,7 +430,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php foreach ($pagos as $pago): ?>
                             <tr>
                                 <td><?= $pago['fecha_pago'] ?></td>
-                                <td>$<?= number_format($pago['valor_pago']) ?></td>
+                                <td class="cell-money">$<?= number_format($pago['valor_pago']) ?></td>
                                 <td>$<?= number_format($pago['pago_mora'] ?? 0) ?></td>
                                 <td>$<?= number_format($pago['pago_capital'] ?? 0) ?></td>
                                 <td>$<?= number_format($pago['saldo_restante']) ?></td>
