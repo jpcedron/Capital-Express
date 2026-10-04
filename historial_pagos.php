@@ -29,9 +29,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
-<?php  
 
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>

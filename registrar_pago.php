@@ -25,6 +25,17 @@ $stmt->execute([$id]);
 
 $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
 
+/* |-------------------------------------------------------------------------- 
+| Límite máximo permitido para el pago |
+-------------------------------------------------------------------------- 
+| El cliente puede pagar: | 
+| pendiente + mora | 
+| La validación definitiva también se realiza en guardar_pago.php. */ 
+$pendiente = floatval($prestamo['pendiente']); 
+
+$mora = floatval($prestamo['mora']); 
+$maxPago = $pendiente + $mora;
+
 ?>
 
 <!DOCTYPE html>
@@ -143,14 +154,14 @@ $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
                         name="valor_pago"
                         class="form-control"
                         min="1"
-                        max="<?= $prestamo['pendiente'] ?>"
+                        max="<?= htmlspecialchars($maxPago) ?>"
                         step="0.01"
                         required
                     >
 
                     <p class="form-hint">
                         <i class="bi bi-info-circle"></i>
-                        El valor no puede superar el saldo pendiente de $<?= number_format($prestamo['pendiente']) ?>.
+                        El valor no puede superar el saldo pendiente de $<?= number_format($maxPago) ?>.
                     </p>
 
                 </div>

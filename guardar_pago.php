@@ -1,7 +1,9 @@
+
 <?php
 
 require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
+require_once "actualizar_mora.php";
 
 $conexion = (new Conexion())->conectar();
 
@@ -9,12 +11,20 @@ $conexion = (new Conexion())->conectar();
    VALIDAR DATOS DEL FORMULARIO
 ========================================================= */
 
-$prestamo_id = filter_input( INPUT_POST, 'prestamo_id', FILTER_VALIDATE_INT );
-$valor_pago = filter_input( INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT );
+$prestamo_id = filter_input(INPUT_POST, 'prestamo_id', FILTER_VALIDATE_INT);
+$valor_pago = filter_input(INPUT_POST, 'valor_pago', FILTER_VALIDATE_FLOAT);
 
 if (!$prestamo_id || $valor_pago === false || $valor_pago <= 0) {
     die("Datos de pago inválidos.");
 }
+
+/*
+ * Conservamos el valor original que realmente entregó
+ * el cliente. Esta variable NO se modifica.
+ */
+$valor_pago_original = $valor_pago;
+
+
 /*
  * Una única fecha para todo el registro del pago.
  * Se utilizará tanto en pagos como en cuotas.
@@ -23,7 +33,25 @@ $fechaPago = date('Y-m-d H:i:s');
 
 
 /* =========================================================
-   OBTENER PRÉSTAMO
+   ACTUALIZAR MORA ANTES DE PROCESAR EL PAGO
+========================================================= */
+
+/*
+ * actualizar_mora.php es la función que contiene la lógica
+ * oficial de mora del sistema.
+ *
+ * Esto permite que, antes de registrar el pago:
+ *
+ * - se calculen todas las cuotas vencidas;
+ * - se respete el período de 2 días sin mora;
+ * - se calcule la mora individual de cada cuota;
+ * - se acumule la mora total del préstamo.
+ */
+actualizarMora($conexion, $prestamo_id);
+
+
+/* =========================================================
+   OBTENER PRÉSTAMO ACTUALIZADO
 ========================================================= */
 
 $sql = "SELECT *
@@ -45,6 +73,27 @@ if ($prestamo['estado'] === 'Pagado') {
 
 
 /* =========================================================
+   VALIDAR VALOR MÁXIMO DEL PAGO
+========================================================= */
+
+/*
+ * El cliente puede pagar:
+ *
+ *     capital pendiente + mora generada
+ *
+ * La mora es un valor adicional al capital pendiente.
+ */
+$pendiente = floatval($prestamo['pendiente']);
+$mora = floatval($prestamo['mora']);
+
+$maximoPago = $pendiente + $mora;
+
+if ($valor_pago_original > $maximoPago) {
+    die("El valor del pago supera el saldo pendiente más la mora.");
+}
+
+
+/* =========================================================
    BUSCAR LA PRIMERA CUOTA PENDIENTE O EN MORA
 ========================================================= */
 
@@ -53,6 +102,7 @@ $sqlCuota = "
     FROM cuotas
     WHERE prestamo_id = ?
     AND estado IN ('Pendiente','Mora')
+    AND pagada = 0
     ORDER BY numero_cuota ASC
     LIMIT 1
 ";
@@ -72,69 +122,27 @@ if (!$cuota) {
    DATOS INICIALES
 ========================================================= */
 
-$pendiente = floatval($prestamo['pendiente']);
-$mora = floatval($prestamo['mora']);
-
 $hoy = new DateTime();
 
-
-/* =========================================================
-   OBTENER FECHA DE LA ÚLTIMA CUOTA
-========================================================= */
-
-$sqlUltima = "
-    SELECT MAX(fecha_vencimiento) AS ultima_fecha
-    FROM cuotas
-    WHERE prestamo_id = ?
-";
-
-$stmtUltima = $conexion->prepare($sqlUltima);
-$stmtUltima->execute([$prestamo_id]);
-
-$ultimaCuota = $stmtUltima->fetch(PDO::FETCH_ASSOC);
+$fecha_vencimiento = new DateTime(
+    $cuota['fecha_vencimiento']
+);
 
 
 /* =========================================================
-   VERIFICAR SI EL PRÉSTAMO YA FINALIZÓ
+   CALCULAR DÍAS DE ATRASO DE LA CUOTA
 ========================================================= */
-
-$prestamoFinalizado = false;
-
-if (!empty($ultimaCuota['ultima_fecha'])) {
-    $fechaFinal = new DateTime($ultimaCuota['ultima_fecha']);
-    if ($hoy > $fechaFinal) {
-        $diasFinal = $fechaFinal->diff($hoy)->days;
-        if ($diasFinal >= 3) {
-            $prestamoFinalizado = true;
-        }
-    }
-}
-
-
-/* =========================================================
-   DEFINIR BASE PARA CALCULAR MORA
-========================================================= */
-
-if ($prestamoFinalizado) {
-    // El préstamo ya terminó:
-    // la mora se calcula sobre el saldo pendiente.
-    $baseMora = $pendiente;
-} else {
-    // El préstamo sigue vigente:
-    // la mora se calcula sobre la cuota vencida.
-    $baseMora = floatval($cuota['valor']);
-}
-
-
-/* =========================================================
-   CALCULAR DÍAS DE ATRASO
-========================================================= */
-
-$fecha_vencimiento = new DateTime( $cuota['fecha_vencimiento'] );
 
 $dias_atraso = 0;
 
 if ($hoy > $fecha_vencimiento) {
+
+    /*
+     * Los días se cuentan desde la fecha original
+     * de vencimiento de la cuota.
+     *
+     * Los 2 días de gracia NO se eliminan de este conteo.
+     */
     $dias_atraso = $fecha_vencimiento
         ->diff($hoy)
         ->days;
@@ -142,61 +150,20 @@ if ($hoy > $fecha_vencimiento) {
 
 
 /* =========================================================
-   CALCULAR MORA
+   ACTUALIZAR INFORMACIÓN DE LA CUOTA ACTUAL
 ========================================================= */
 
-if ($dias_atraso >= 3) {
-    if ($dias_atraso <= 14) {
-        $porcentaje = 5;
-    } elseif ($dias_atraso <= 29) {
-        $porcentaje = 10;
-    } elseif ($dias_atraso <= 44) {
-        $porcentaje = 15;
-    } else {
-        $porcentaje = 20;
-    }
+/*
+ * La mora de todas las cuotas ya fue calculada por
+ * actualizarMora().
+ *
+ * Aquí solamente mantenemos actualizada la información
+ * de la cuota que se está procesando.
+ */
 
-    $ultima_mora = $prestamo['ultima_mora'];
+$moraCuota = floatval($cuota['mora']);
 
-
-    if ($ultima_mora !== date('Y-m-d')) {
-        $semanas = max( 1, ceil(($dias_atraso - 2) / 7) );
-
-        $mora = round(
-            $baseMora *
-            ($porcentaje / 100) *
-            $semanas,
-            2
-        );
-
-
-        $sql = "
-            UPDATE prestamos
-            SET
-                mora = ?,
-                porcentaje_mora = ?,
-                ultima_mora = ?,
-                estado = 'Mora'
-            WHERE id = ?
-        ";
-
-        $stmt = $conexion->prepare($sql);
-
-        $stmt->execute([
-            $mora,
-            $porcentaje,
-            date('Y-m-d'),
-            $prestamo_id
-        ]);
-    }
-}
-
-
-/* =========================================================
-   ACTUALIZAR ESTADO DE LA CUOTA ANTES DEL PAGO
-========================================================= */
-
-$estadoCuota = ($mora > 0)
+$estadoCuota = ($moraCuota > 0)
     ? "Mora"
     : "Pendiente";
 
@@ -205,7 +172,6 @@ $sql = "
     UPDATE cuotas
     SET
         dias_atraso = ?,
-        mora = ?,
         estado = ?
     WHERE id = ?
 ";
@@ -214,7 +180,6 @@ $stmt = $conexion->prepare($sql);
 
 $stmt->execute([
     $dias_atraso,
-    $mora,
     $estadoCuota,
     $cuota['id']
 ]);
@@ -227,7 +192,13 @@ $stmt->execute([
 $pago_mora = 0;
 $pago_capital = 0;
 
+
+/*
+ * La mora utilizada aquí es la mora TOTAL acumulada
+ * del préstamo, calculada previamente por actualizarMora().
+ */
 if ($mora > 0) {
+
     $pago_mora = min(
         $valor_pago,
         $mora
@@ -259,7 +230,7 @@ if ($valor_pago > 0) {
 ========================================================= */
 
 $nuevo_abonado =
-    $prestamo['abonado']
+    floatval($prestamo['abonado'])
     + $pago_mora
     + $pago_capital;
 
@@ -382,7 +353,15 @@ $stmt = $conexion->prepare($sql);
 
 $stmt->execute([
     $prestamo_id,
-    $valor_pago,
+
+    /*
+     * IMPORTANTE:
+     * Aquí usamos el valor ORIGINAL que entregó
+     * el cliente, no la variable que fue reducida
+     * al distribuir mora y capital.
+     */
+    $valor_pago_original,
+
     $fechaPago,
     $pago_mora,
     $pago_capital,
@@ -390,8 +369,9 @@ $stmt->execute([
     ""
 ]);
 
+
 /* =========================================================
- REDIRECCIÓN
+   REDIRECCIÓN
 ========================================================= */
 
 header("Location: listado.php");

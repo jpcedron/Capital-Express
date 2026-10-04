@@ -5,6 +5,48 @@ require_once "config/conexion.php";
 
 $conexion = (new Conexion())->conectar();
 
+/* =========================================================
+    VALIDAR CAMPOS OBLIGATORIOS
+   ========================================================= */
+if (
+    empty($_POST['nombre']) ||
+    empty($_POST['cedula']) ||
+    empty($_POST['telefono']) ||
+    !isset($_POST['monto']) ||
+    !isset($_POST['interes']) ||
+    !isset($_POST['cuotas']) ||
+    empty($_POST['frecuencia'])
+) {
+    die("Todos los campos obligatorios deben estar completos.");
+}
+
+$monto = floatval($_POST['monto']);
+$interes = floatval($_POST['interes']);
+$numeroCuotas = intval($_POST['cuotas']);
+$frecuencia = $_POST['frecuencia'];
+
+/* =========================================================
+    VALIDAR CAMPOS DEL PRÉSTAMO
+   ========================================================= */
+if ($monto <= 0) {
+    die("El monto del préstamo debe ser mayor que cero.");
+}
+
+if ($interes < 0) {
+    die("El interés no puede ser negativo.");
+}
+
+if ($numeroCuotas <= 0) {
+    die("El número de cuotas debe ser mayor que cero.");
+}
+
+if (!in_array($frecuencia, ['Semanal', 'Quincenal'], true)) {
+    die("La frecuencia de pago seleccionada no es válida.");
+}
+
+$conexion->beginTransaction();
+
+try { 
 
 /* =========================================================
    1. BUSCAR CLIENTE POR CÉDULA
@@ -139,14 +181,9 @@ if ($prestamoExistente) {
     }
 }
 
-
 /* =========================================================
    7. CALCULAR EL PRÉSTAMO
    ========================================================= */
-
-$monto = floatval($_POST['monto']);
-$interes = floatval($_POST['interes']);
-$numeroCuotas = intval($_POST['cuotas']);
 
 $total_pagar =
     $monto +
@@ -164,8 +201,7 @@ $valor_cuota =
         2
     );
 
-$porcentaje_mora =
-    $_POST["porcentaje_mora"] ?? 2;
+$porcentaje_mora = 0;
 
 
 /* =========================================================
@@ -203,7 +239,7 @@ $stmt->execute([
     $abonado,
     $pendiente,
     $porcentaje_mora,
-    $_POST['frecuencia']
+    $frecuencia
 ]);
 
 
@@ -233,32 +269,24 @@ $stmtCuota = $conexion->prepare($sqlCuota);
    FRECUENCIA SEMANAL
    ========================================================= */
 
-if ($_POST['frecuencia'] === "Semanal") {
+if ($frecuencia === "Semanal") {
 
-    // Buscar el siguiente sábado
-    $primerSabado = clone $fecha;
+    $fechaCuota = clone $fecha;
 
-    if ($primerSabado->format('N') == 6) {
-
-        // Si hoy es sábado, cobrar el siguiente sábado
-        $primerSabado->modify('+7 days');
-
-    } else {
-
-        $primerSabado->modify('next saturday');
-    }
-
+    // Primera cuota: exactamente 7 días después
+    $fechaCuota->modify('+7 days');
 
     for ($i = 1; $i <= $numeroCuotas; $i++) {
 
         $stmtCuota->execute([
             $prestamo_id,
             $i,
-            $primerSabado->format('Y-m-d'),
+            $fechaCuota->format('Y-m-d'),
             $valor_cuota
         ]);
 
-        $primerSabado->modify('+7 days');
+        // Siguiente cuota: 7 días después
+        $fechaCuota->modify('+7 days');
     }
 
 
@@ -348,9 +376,27 @@ if ($_POST['frecuencia'] === "Semanal") {
     }
 }
 
+
 /* =========================================================
-   11. REGRESAR AL LISTADO
+   11. CONFIRMAR TRANSACCIÓN
+   ========================================================= */
+
+$conexion->commit();
+
+
+/* =========================================================
+   12. REGRESAR AL LISTADO
    ========================================================= */
 
 header("Location: listado.php");
 exit;
+
+
+} catch (Throwable $e) {
+
+    if ($conexion->inTransaction()) {
+        $conexion->rollBack();
+    }
+
+    die("No fue posible registrar el préstamo.");
+}
