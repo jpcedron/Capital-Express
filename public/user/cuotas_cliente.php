@@ -56,7 +56,7 @@ $cuotas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
     <!-- Mismo diseño que la cartilla -->
-    <link rel="stylesheet" href="../css/cartilla_cliente.css">
+    <link rel="stylesheet" href="../../css/cartilla_cliente.css">
 </head>
 
 <body class="ce-body">

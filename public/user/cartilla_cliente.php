@@ -84,7 +84,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
 <!-- Diseño del panel de usuario -->
-<link rel="stylesheet" href="../css/cartilla_cliente.css">
+<link rel="stylesheet" href="../../css/cartilla_cliente.css">
 </head>
 
 <body class="ce-body">
@@ -290,7 +290,7 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         Volver
                     </a>
 
-                    <a href="../descargar_cartilla.php?id=<?= $prestamo['id'] ?>" class="btn-ce btn-ce--solid">
+                    <a href="../../descargar_cartilla.php?id=<?= $prestamo['id'] ?>" class="btn-ce btn-ce--solid">
                         <i class="bi bi-file-earmark-arrow-down-fill"></i>
                         Descargar Cartilla PDF
                     </a>
@@ -303,4 +303,4 @@ $pagos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html> 
