@@ -159,42 +159,42 @@ function buscarCliente() {
         ).style.display = "block";
 
 
-        document.getElementById("txtNombre").innerHTML =
-            data.nombre || "";
+        document.getElementById("txtNombre").textContent =
+        data.nombre || "";
 
-        document.getElementById("txtTelefono").innerHTML =
+        document.getElementById("txtTelefono").textContent =
             data.telefono || "";
 
-        document.getElementById("txtDireccion").innerHTML =
+        document.getElementById("txtDireccion").textContent =
             data.direccion || "";
 
-        document.getElementById("txtEstado").innerHTML =
+        document.getElementById("txtEstado").textContent =
             data.estado || "Sin préstamo";
 
-        document.getElementById("txtMonto").innerHTML =
+        document.getElementById("txtMonto").textContent =
             data.monto
                 ? "$" + Number(data.monto).toLocaleString("es-CO")
                 : "$0";
 
-        document.getElementById("txtAbonado").innerHTML =
+        document.getElementById("txtAbonado").textContent =
             data.abonado
                 ? "$" + Number(data.abonado).toLocaleString("es-CO")
                 : "$0";
 
-        document.getElementById("txtPendiente").innerHTML =
+        document.getElementById("txtPendiente").textContent =
             data.pendiente
                 ? "$" + Number(data.pendiente).toLocaleString("es-CO")
                 : "$0";
 
-        document.getElementById("txtMora").innerHTML =
+        document.getElementById("txtMora").textContent =
             data.mora
                 ? "$" + Number(data.mora).toLocaleString("es-CO")
                 : "$0";
 
-        document.getElementById("txtFrecuencia").innerHTML =
+        document.getElementById("txtFrecuencia").textContent =
             data.frecuencia || "Sin préstamo";
 
-        document.getElementById("txtFecha").innerHTML =
+        document.getElementById("txtFecha").textContent =
             data.fecha_limite || "Sin préstamo";
 
 
