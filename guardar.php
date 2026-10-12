@@ -3,27 +3,102 @@
 require_once "public/admin/auth_admin.php";
 require_once "config/conexion.php";
 
-$conexion = (new Conexion())->conectar();
+/* =====================================================
+   VALIDAR MÉTODO DE PETICIÓN
+   ===================================================== */
 
-/* =========================================================
-    VALIDAR CAMPOS OBLIGATORIOS
-   ========================================================= */
-if (
-    empty($_POST['nombre']) ||
-    empty($_POST['cedula']) ||
-    empty($_POST['telefono']) ||
-    !isset($_POST['monto']) ||
-    !isset($_POST['interes']) ||
-    !isset($_POST['cuotas']) ||
-    empty($_POST['frecuencia'])
-) {
-    die("Todos los campos obligatorios deben estar completos.");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: index.php');
+    exit;
 }
 
-$monto = floatval($_POST['monto']);
-$interes = floatval($_POST['interes']);
-$numeroCuotas = intval($_POST['cuotas']);
-$frecuencia = $_POST['frecuencia'];
+$conexion = (new Conexion())->conectar();
+
+
+/* =========================================================
+   VALIDAR CAMPOS OBLIGATORIOS
+   ========================================================= */
+
+$camposTexto = ['nombre', 'cedula', 'telefono', 'direccion'];
+
+foreach ($camposTexto as $campo) {
+    if (
+        !isset($_POST[$campo]) ||
+        !is_string($_POST[$campo]) ||
+        trim($_POST[$campo]) === ''
+    ) {
+        die("Todos los campos obligatorios deben estar completos.");
+    }
+}
+
+$camposNumericos = ['monto', 'interes', 'cuotas'];
+
+foreach ($camposNumericos as $campo) {
+    if (
+        !isset($_POST[$campo]) ||
+        !is_string($_POST[$campo]) ||
+        trim($_POST[$campo]) === ''
+    ) {
+        die("Todos los campos del préstamo deben estar completos.");
+    }
+}
+
+if (
+    !isset($_POST['frecuencia']) ||
+    !is_string($_POST['frecuencia']) ||
+    trim($_POST['frecuencia']) === ''
+) {
+    die("Debes seleccionar una frecuencia de pago.");
+}
+
+
+
+/* =====================================================
+   VALIDAR Y CONVERTIR DATOS DEL PRÉSTAMO
+   ===================================================== */
+
+$montoRaw = trim((string) $_POST['monto']);
+$interesRaw = trim((string) $_POST['interes']);
+$cuotasRaw = trim((string) $_POST['cuotas']);
+$frecuenciaRaw = $_POST['frecuencia'];
+
+if (
+    $montoRaw === '' ||
+    $interesRaw === '' ||
+    $cuotasRaw === '' ||
+    !is_string($frecuenciaRaw)
+) {
+    die("Los datos del préstamo no son válidos.");
+}
+
+/* Validar formato numérico */
+if (!is_numeric($montoRaw) || !is_numeric($interesRaw)) {
+    die("El monto y el interés deben ser numéricos.");
+}
+
+/* Las cuotas deben ser un número entero positivo */
+if (!preg_match('/^[1-9][0-9]*$/', $cuotasRaw)) {
+    die("El número de cuotas debe ser un entero positivo.");
+}
+
+$monto = (float) $montoRaw;
+$interes = (float) $interesRaw;
+$numeroCuotas = (int) $cuotasRaw;
+$frecuencia = $frecuenciaRaw;
+
+/* Validar rangos */
+if (!is_finite($monto) || $monto <= 0) {
+    die("El monto del préstamo debe ser mayor que cero.");
+}
+
+if (!is_finite($interes) || $interes < 0) {
+    die("El interés no puede ser negativo.");
+}
+
+if (!in_array($frecuencia, ['Semanal', 'Quincenal'], true)) {
+    die("La frecuencia de pago seleccionada no es válida.");
+}
+
 
 /* =========================================================
     VALIDAR CAMPOS DEL PRÉSTAMO
@@ -44,9 +119,11 @@ if (!in_array($frecuencia, ['Semanal', 'Quincenal'], true)) {
     die("La frecuencia de pago seleccionada no es válida.");
 }
 
-$conexion->beginTransaction();
+
 
 try { 
+
+$conexion->beginTransaction();
 
 /* =========================================================
    1. BUSCAR CLIENTE POR CÉDULA
@@ -54,11 +131,12 @@ try {
 
 $sqlCliente = "SELECT id, nombre, cedula, telefono, direccion, estado_cliente
                FROM clientes
-               WHERE cedula = ?";
+               WHERE cedula = ?
+               FOR UPDATE";
 
 $stmtCliente = $conexion->prepare($sqlCliente);
-$stmtCliente->execute([$_POST['cedula']]);
 
+$stmtCliente->execute([trim($_POST['cedula'])]);
 $clienteExiste = $stmtCliente->fetch(PDO::FETCH_ASSOC);
 
 
@@ -119,11 +197,16 @@ if (!$clienteExiste) {
        4. BLOQUEAR CLIENTE INACTIVO
        ===================================================== */
 
+    
     if ($estado_cliente === 'inactivo') {
+        if ($conexion->inTransaction()) {
+            $conexion->rollBack();
+        }
 
         header("Location: index.php?error=cliente_inactivo");
         exit;
     }
+
 
 
     /* =====================================================
@@ -167,18 +250,20 @@ $prestamoExistente = $stmtBuscar->fetch(PDO::FETCH_ASSOC);
 
 if ($prestamoExistente) {
 
-    if (
-        $prestamoExistente['estado'] === "Activo" ||
-        $prestamoExistente['estado'] === "Mora"
-    ) {
+    if ($prestamoExistente['estado'] === "Activo" ||
+        $prestamoExistente['estado'] === "Mora") {
+
+        if ($conexion->inTransaction()) {
+            $conexion->rollBack();
+        }
 
         echo "<script>
             alert('Este cliente ya tiene un préstamo activo y no puede registrar otro.');
             window.location='index.php';
         </script>";
-
         exit;
     }
+
 }
 
 /* =========================================================
@@ -397,6 +482,8 @@ exit;
     if ($conexion->inTransaction()) {
         $conexion->rollBack();
     }
+
+    error_log("Error al registrar préstamo: " . $e->getMessage());
 
     die("No fue posible registrar el préstamo.");
 }

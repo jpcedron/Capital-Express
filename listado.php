@@ -175,7 +175,7 @@ $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
               </td>
 
               <td>
-                <div class="d-flex align-items-center gap-2 flex-wrap">
+                <div class="d-flex align-items-center gap-1 flex-wrap flex-lg-nowrap">
                   <a href="cartilla.php?id=<?= $prestamo['id'] ?>"
                     class="btn-action btn-action-cartilla">
                     <i class="bi bi-journal-text"></i> Cartilla

@@ -39,6 +39,7 @@ $recibo_items = [
     'Total actualizado',
 ];
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>

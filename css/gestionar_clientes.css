@@ -308,6 +308,7 @@ font-family: 'Playfair Display', serif;
   align-items: center;
   gap: 0.4rem;
   flex-wrap: wrap;
+  flex-flow: nowrap;
 }
 
 .ce-btn-icon {

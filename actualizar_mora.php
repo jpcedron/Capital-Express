@@ -55,7 +55,11 @@ function actualizarMora($conexion, $prestamo_id)
     // ==========================================================
     // 4. VARIABLES GENERALES
     // ==========================================================
-    $hoy = new DateTime();
+
+    // Usar la fecha actual de Colombia.
+    $zonaHoraria = new DateTimeZone('America/Bogota');
+
+    $hoy = new DateTimeImmutable('today', $zonaHoraria);
 
     $moraTotal = 0;
     $porcentajeMaximo = 0;
@@ -66,21 +70,24 @@ function actualizarMora($conexion, $prestamo_id)
     // ==========================================================
     foreach ($cuotas as $cuota) {
 
-        $fechaVencimiento = new DateTime(
-            $cuota['fecha_vencimiento']
+        // Comparar únicamente fechas, sin horas.
+        $fechaVencimiento = new DateTimeImmutable(
+            $cuota['fecha_vencimiento'],
+            $zonaHoraria
         );
+
+        $fechaVencimiento = $fechaVencimiento->setTime(0, 0, 0);
 
         $diasAtraso = 0;
 
-        // ------------------------------------------------------
-        // Calcular días de atraso
-        // ------------------------------------------------------
         if ($hoy > $fechaVencimiento) {
 
-            $diasAtraso = $fechaVencimiento
+            $diasAtraso = (int) $fechaVencimiento
                 ->diff($hoy)
                 ->days;
         }
+        // Continúa aquí con tu lógica actual
+        // de porcentajes, cálculo de mora y actualización.
 
 
         // ------------------------------------------------------
